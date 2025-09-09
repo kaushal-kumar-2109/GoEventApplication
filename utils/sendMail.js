@@ -16,7 +16,7 @@ const OtpCreater = () => {
 const sendMail = async (email) => {
     if(! await checkInternet()){return false};
     const otp = OtpCreater();
-    const resposn= await fetch("http://10.86.127.18:3000/GoEvent/User/Email/Otp", {
+    const resposn= await fetch("https://goeventserver.onrender.com/GoEvent/User/Email/Otp", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
