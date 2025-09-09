@@ -1,0 +1,212 @@
+// importing pre-build components 
+import { View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
+import { useState } from "react";
+import Feather from "@expo/vector-icons/Feather";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+
+// importing user-built components 
+import { CSS } from "../../../styles/basicStyle";
+import { alignItem, colorSchema, display, felx, justifyContent } from "../../../styles/constant";
+
+const Login = () => {
+  const [checkLogin, setCheckLogin] = useState(false);
+  const [userNameErr,setUserNameErr] = useState({display:'none'});
+  const [emailErr,setEmailErr] = useState({display:'none'});
+  const [emailOtpErr,setOtpEmailErr] = useState({display:'none'});
+  const [numberErr,setNumberErr] = useState({display:'none'});
+  const [numberOtpErr,setNumberOtpErr] = useState({display:'none'});
+  const [passwordErr,setPasswordErr] = useState({display:'none'});
+  const [userName,setUserName] = useState('');
+  const [email,setEmail] = useState('');
+  const [emailOtp,setEmailOtp] = useState('');
+  const [number,setNumber] = useState('');
+  const [numberOtp,setNumberOtp] = useState('');
+  const [password,setPassword] = useState('');
+
+  const ShowForm = () => {
+    if (!checkLogin) {
+      // Signup form
+      return (
+        <ScrollView>
+          <View style={[CSS["px5"], CSS["py30"], display.df, alignItem.ali_c, justifyContent.jc_c]}>
+            <Text style={[{ fontSize: 30 }, CSS["fw6"]]}>Signup</Text>
+            <View style={[display.df, felx.fd_r]}>
+              <Text>Already have an account? </Text>
+              <TouchableOpacity onPress={() => setCheckLogin(true)}>
+                <Text style={[CSS["fw8"], CSS["ml10"]]}>Login</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={[CSS["mt40"], { width: "100%" }, display.df, alignItem.ali_c]}>
+              {/* Username */}
+              <View style={inputContainer}>
+                <View style={inputLabel}>
+                  <Feather name="user" size={24} />
+                  <TextInput placeholder="User Name" style={inputField} />
+                </View>
+              </View>
+              <Text style={[{ color: "#ff0000ff" },userNameErr]}>🚫 User Name is required!</Text>
+
+              {/* Email */}
+              <View style={inputContainer}>
+                <View style={inputLabel}>
+                  <Feather name="mail" size={24} />
+                  <TextInput placeholder="Example@gmail.com" keyboardType="email-address" style={inputField} />
+                </View>
+                <TouchableOpacity style={button}>
+                  <Text style={buttonText}>Get Otp</Text>
+                </TouchableOpacity>
+              </View>
+              <Text style={[{ color: "#ff0000ff" },emailErr]}>🚫 Email is required!</Text>
+
+              {/* Email OTP */}
+              <View style={inputContainer}>
+                <View style={inputLabel}>
+                  <MaterialCommunityIcons name="email-newsletter" size={24} color="black" />
+                  <TextInput placeholder="Enter OTP on Email" style={inputField} />
+                </View>
+                <TouchableOpacity style={button}>
+                  <Text style={buttonText}> Check </Text>
+                </TouchableOpacity>
+              </View>
+              <Text style={[{ color: "#ff0000ff" },emailOtpErr]}>🚫 Email OTP is required!</Text>
+
+              {/* Phone Number */}
+              <View style={inputContainer}>
+                <View style={inputLabel}>
+                  <Feather name="phone" size={24} color="black" />
+                  <TextInput placeholder="Enter Mobile Number" style={inputField} />
+                </View>
+                <TouchableOpacity style={button}>
+                  <Text style={buttonText}>Get otp</Text>
+                </TouchableOpacity>
+              </View>
+              <Text style={[{ color: "#ff0000ff" },numberErr]}>🚫 Phone Number is required!</Text>
+
+              {/* Phone Number OTP */}
+              <View style={inputContainer}>
+                <View style={inputLabel}>
+                  <MaterialCommunityIcons name="email-newsletter" size={24} color="black" />
+                  <TextInput
+                    placeholder="Enter OTP on Number"
+                    style={inputField}
+                  />
+                </View>
+                <TouchableOpacity style={button}>
+                  <Text style={buttonText}> Check </Text>
+                </TouchableOpacity>
+              </View>
+              <Text style={[{ color: "#ff0000ff" },numberOtpErr]}>🚫 Phone Number OTP is required!</Text>
+
+              {/* Password */}
+              <View style={inputContainer}>
+                <View style={inputLabel}>
+                  <MaterialCommunityIcons name="lock" size={24} />
+                  <TextInput placeholder="Enter Password" style={inputField} onChangeText={(text)=>{setPassword(text)}} secureTextEntry />
+                </View>
+              </View>
+              <Text style={[{ color: "#ff0000ff" },passwordErr]}>🚫 Password is required!</Text>
+
+              {/* Submit */}
+              <View style={[{ marginTop: 40, width: "80%" }]}>
+                <TouchableOpacity
+                  style={[
+                    { borderRadius: 10, width: "100%", backgroundColor: "#0d00fdff" },
+                    CSS["p15"],
+                    display.df,
+                    alignItem.ali_c,
+                  ]}
+                  onPress={()=>{createAccount();}}
+                >
+                  <Text style={buttonText}>Create Account</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      );
+    } else {
+      // Login form
+      return (
+        <ScrollView>
+          <View style={[CSS["px5"], CSS["py30"], display.df, alignItem.ali_c, justifyContent.jc_c]}>
+            <Text style={[{ fontSize: 30 }, CSS["fw6"]]}>Login</Text>
+            <View style={[display.df, felx.fd_r]}>
+              <Text>Don’t have an account? </Text>
+              <TouchableOpacity onPress={() => setCheckLogin(false)}>
+                <Text style={[CSS["fw8"], CSS["ml10"]]}>Register</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={[CSS["mt40"], { width: "100%" }, display.df, alignItem.ali_c]}>
+              {/* Email */}
+              <View style={inputContainer}>
+                <View style={inputLabel}>
+                  <Feather name="mail" size={24} />
+                  <TextInput
+                    placeholder="Example@gmail.com"
+                    style={inputField}
+                    keyboardType="email-address"
+                  />
+                </View>
+              </View>
+              <Text style={[{ color: "#ff0000ff" },emailErr]}>🚫 Email is required!</Text>
+
+              {/* Password */}
+              <View style={inputContainer}>
+                <View style={inputLabel}>
+                  <MaterialCommunityIcons name="lock" size={24} />
+                  <TextInput placeholder="Enter Password" style={inputField} secureTextEntry />
+                </View>
+              </View>
+              <Text style={[{ color: "#ff0000ff" },passwordErr]}>🚫 Password is required!</Text>
+
+              {/* Submit */}
+              <View style={[{ marginTop: 40, width: "80%" }]}>
+                <TouchableOpacity
+                  style={[
+                    { borderRadius: 10, width: "100%", backgroundColor: "#0d00fdff" },
+                    CSS["p15"],
+                    display.df,
+                    alignItem.ali_c,
+                  ]}
+                >
+                  <Text style={buttonText}>Login Account</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      );
+    }
+  };
+
+  const createAccount = () => {
+
+  }
+  return <ShowForm />;
+};
+
+export { Login };
+
+// Styling variables
+const inputContainer = [
+  { width: "80%", borderWidth: 1, borderColor: "#1f1e1e30" },
+  display.df,
+  felx.fd_r,
+  alignItem.ali_c,
+  justifyContent.jc_sb,
+  CSS["p10"],
+  CSS["mt20"],
+];
+const inputLabel = [{ width: "80%" }, display.df, felx.fd_r, alignItem.ali_c];
+const inputField = [
+  CSS["ml10"],
+  { borderLeftWidth: 1, width: "80%", borderColor: "#1f1e1e30" },
+  CSS["px10"],
+];
+const button = [{ backgroundColor: "#0d00fdff", borderRadius: 10 }, CSS["p10"]];
+const buttonText = [colorSchema.textLighter];
+
+// functions 
+const CheckValue = () => {}
