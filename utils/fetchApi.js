@@ -1,3 +1,6 @@
+import axios from 'axios';
+
+
 const fetchApi = async (url) => {
   try {
     const response = await fetch(url);

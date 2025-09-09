@@ -1,4 +1,4 @@
-import { ReloadInstructions } from "react-native/Libraries/NewAppScreen";
+
 import { checkInternet } from "./checkNetwork";
 
 const OtpCreater = () => {
@@ -17,8 +17,8 @@ const sendMail = async (email) => {
 
     if(! await checkInternet()){return false};
 
-    console.log('here');
-    let res = await fetch("https://goeventserver.onrender.com/GoEvent/User/by/Email", {
+    console.log('hereq');
+    let res = await fetch("https://goeventserver.onrender.com/goevent/user/email", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -27,35 +27,41 @@ const sendMail = async (email) => {
         UserEmail:email
       })
     });
+    console.log(res);
+    console.log('ok');
     res = await res.json();
+    console.log("ok2");
     console.log(res);
 
-    if(res.data!=false){
+    if(res.status){
       alert("The Email Is Already In Use.");
       return;
     }
-
-    const otp = OtpCreater();
-    const resposn= await fetch("https://goeventserver.onrender.com/GoEvent/User/Email/Otp", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        UserEmail:email,
-        OTP:otp
-      })
-    });
-    if(resposn.status==200){
-      console.log('otp Send Sucessfully');
-      alert('Otp Send Sucessfully');
-      return({OTP:otp,status:true});
-    }
     else{
-      console.log("Otp not send");
-        alert('Otp Send Error');
-        return false;
+      const otp = OtpCreater();
+      const resposn= await fetch("https://goeventserver.onrender.com/goevent/sendemail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          UserEmail:email,
+          OTP:otp
+        })
+      });
+       if(resposn.status==200){
+        console.log('otp Send Sucessfully');
+        alert('Otp Send Sucessfully');
+        return({OTP:otp,status:true});
+      }
+      else{
+        console.log("Otp not send");
+          alert('Otp Send Error');
+          return false;
+      }
     }
+    
+   
 }
 
 export {sendMail}

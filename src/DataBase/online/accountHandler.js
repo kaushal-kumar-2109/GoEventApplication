@@ -8,7 +8,7 @@ const CreateNewUser = async (body) => {
     if(!network){return false}
 
     console.log("uploading data");
-    const resposn= await fetch("https://goeventserver.onrender.com/GoEvent/Create/User", {
+    const resposn= await fetch("https://goeventserver.onrender.com/goevent/create/user", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

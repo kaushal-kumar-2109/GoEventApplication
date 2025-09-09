@@ -13,13 +13,19 @@ import { alignItem, colorSchema, display, felx, justifyContent } from '../../sty
 // import utils functions 
 import { fetchApi } from "../../../../utils/fetchApi";
 import { Login } from "./pageutils/login";
+import GETUSER from "../../../DataBase/offline/dbHandle/get";
 
 const User = () => { 
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
   const setPage = async () => {
-    let data = await fetchApi('https://goeventserver.onrender.com/GoEvent/User');
+    
+    // let data = await fetchApi('https://goeventserver.onrender.com/goevent/user');
+    console.log('h1');
+    const users = await GETUSER();
+    console.log("Users in DB:", users);
+    console.log('h2');
     if(true ){
         console.log("There is no user found!");
         setLoading(false);
