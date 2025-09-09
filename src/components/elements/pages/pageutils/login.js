@@ -61,6 +61,7 @@ const Login = () => {
     if(isNaN(emailOtp)){setEmailOtpErr('Enter Valid Email Otp! ');return}
     // if(isNaN(number)){setNumberErr("Enter Valid Mobile Number! Without '+91' or '0' ");return}
     // if(isNaN(numberOtp)){setNumberOtpErr('Enter Valid Number Otp! ');return}
+    console.log(validOtp);
     if(parseInt(emailOtp)==parseInt(validOtp)){
       console.log('New User Got');
       CreateNewUser({UserName:userName,UserPassword:password,UserEmail:email,UserRole:userType});

@@ -14,7 +14,27 @@ const OtpCreater = () => {
 }
 
 const sendMail = async (email) => {
+
     if(! await checkInternet()){return false};
+
+    console.log('here');
+    let res = await fetch("https://goeventserver.onrender.com/GoEvent/User/by/Email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        UserEmail:email
+      })
+    });
+    res = await res.json();
+    console.log(res);
+
+    if(res.data!=false){
+      alert("The Email Is Already In Use.");
+      return;
+    }
+
     const otp = OtpCreater();
     const resposn= await fetch("https://goeventserver.onrender.com/GoEvent/User/Email/Otp", {
       method: "POST",

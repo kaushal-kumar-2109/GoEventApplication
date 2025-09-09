@@ -19,7 +19,8 @@ const User = () => {
   const [user, setUser] = useState(null);
 
   const setPage = async () => {
-    if(! await fetchApi('https://goeventserver.onrender.com/GoEvent/User')){
+    let data = await fetchApi('https://goeventserver.onrender.com/GoEvent/User');
+    if(true ){
         console.log("There is no user found!");
         setLoading(false);
     }
