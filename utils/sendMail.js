@@ -13,51 +13,49 @@ const OtpCreater = () => {
     return(otp);
 }
 
-const sendMail = async (email) => {
+const sendMail = async (email,flag=false) => {
 
     if(! await checkInternet()){return false};
 
-    let res = await fetch("https://goeventserver.onrender.com/goevent/user/email", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        UserEmail:email
-      })
-    });
-    
-    res = await res.json();
-
-    if(res.status){
-      alert("The Email Is Already In Use.");
-      return;
-    }
-    else{
-      const otp = OtpCreater();
-      const resposn= await fetch("https://goeventserver.onrender.com/goevent/sendemail", {
+    if(!flag){
+      let res = await fetch("https://goeventserver.onrender.com/goevent/user/email", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          UserEmail:email,
-          OTP:otp
+          UserEmail:email
         })
       });
-       if(resposn.status==200){
-        console.log('otp Send Sucessfully');
-        alert('Otp Send Sucessfully');
-        return({OTP:otp,status:true});
-      }
-      else{
-        console.log("Otp not send");
-          alert('Otp Send Error');
-          return false;
+      
+      res = await res.json();
+    
+      if(res.status){
+        alert("The Email Is Already In Use.");
+        return;
       }
     }
-    
-   
+    const otp = OtpCreater();
+    const resposn= await fetch("https://goeventserver.onrender.com/goevent/sendemail", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        UserEmail:email,
+        OTP:otp
+      })
+    });
+     if(resposn.status==200){
+      console.log('otp Send Sucessfully');
+      alert('Otp Send Sucessfully');
+      return({OTP:otp,status:true});
+    }
+    else{
+      console.log("Otp not send");
+        alert('Otp Send Error');
+        return false;
+    }
 }
 
 export {sendMail}

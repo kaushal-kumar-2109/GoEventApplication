@@ -15,4 +15,18 @@ const DELETEUSER =async (id) => {
   return allRows;
 }
 
-export {DELETEUSER};
+const TRUNCATEUSER = async () => {
+  const db= await initDB();
+  if (!db) {
+    return; // ensure db is ready
+  }
+  console.log('h1');
+  const allRows = await db.runAsync("TRUNCATE TABLE User;");
+  console.log('h2');
+  console.log(allRows);
+  console.log('all data deleted');
+  
+  return allRows;
+}
+
+export {DELETEUSER,TRUNCATEUSER};

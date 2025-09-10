@@ -12,7 +12,8 @@ import { alignItem, colorSchema, display, felx, justifyContent } from '../../sty
 
 // import utils functions 
 import { fetchApi } from "../../../../utils/fetchApi";
-import { Login } from "./pageutils/login";
+// import { Login } from "./pageutils/login";
+import { Log_Reg_col } from "./pageutils/log_reg_col";
 import {GETUSER} from '../../../DataBase/offline/dbHandle/readData';
 import {DELETEUSER} from '../../../DataBase/offline/dbHandle/deleteData';
 const User = () => { 
@@ -53,7 +54,7 @@ const User = () => {
           <Text>Email: {user.email}</Text>
         </>
       ) : (
-        <Login></Login>
+        <Log_Reg_col></Log_Reg_col>
       )}
       
     </ScrollView>
