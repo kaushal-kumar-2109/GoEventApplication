@@ -1,22 +1,29 @@
 import * as SQLite from "expo-sqlite";
 
-// open or create database (sync API works well in RN/Expo)
-const db = SQLite.openDatabaseSync("goevent.db");
 
-// create table if not exists
-export const initDB = () => {
-  db.execAsync(`
-    CREATE TABLE IF NOT EXISTS user (
+async function initDB() {
+  const db = await SQLite.openDatabaseAsync("GoEvent");
+  // Create table if not exists
+  try{
+    await db.execAsync(`
+    PRAGMA journal_mode = WAL;
+    CREATE TABLE IF NOT EXISTS User (
       id TEXT PRIMARY KEY NOT NULL,
-      name TEXT,
-      email TEXT,
-      phone TEXT DEFAULT 'none',
-      password TEXT,
-      role TEXT DEFAULT 'user',
-      createdAt TEXT,
-      profilepic TEXT DEFAULT 'none'
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      password TEXT NOT NULL,
+      userRole TEXT DEFAULT 'user',
+      createdAT TEXT DEFAULT NULL,
+      profilePic TEXT DEFAULT NULL,
+      phone TEXT DEFAULT NULL
     );
   `);
-};
+  console.log("Database initialized ✅");
+  return db;
+  }catch(err){
+    console.log("Error in Database initialization.:",err);
+    return false;
+  }
+}
 
-export default db;
+export {initDB};

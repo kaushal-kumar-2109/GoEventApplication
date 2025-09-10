@@ -13,8 +13,8 @@ import { alignItem, colorSchema, display, felx, justifyContent } from '../../sty
 // import utils functions 
 import { fetchApi } from "../../../../utils/fetchApi";
 import { Login } from "./pageutils/login";
-import GETUSER from "../../../DataBase/offline/dbHandle/get";
-
+import {GETUSER} from '../../../DataBase/offline/dbHandle/readData';
+import {DELETEUSER} from '../../../DataBase/offline/dbHandle/deleteData';
 const User = () => { 
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -22,23 +22,25 @@ const User = () => {
   const setPage = async () => {
     
     // let data = await fetchApi('https://goeventserver.onrender.com/goevent/user');
-    console.log('h1');
-    const users = await GETUSER();
-    console.log("Users in DB:", users);
-    console.log('h2');
-    if(true ){
+    const user = await GETUSER();
+
+    if(!user || user.length<1){
         console.log("There is no user found!");
         setLoading(false);
+        setUser(null);
     }
     else{
-        console.log("There is a user found!");
+      const data = user[0];
+      setUser(data);
+      setLoading(false);
+      console.log("There is a user found!");
     }
 
 };
 
   useEffect(() => {
     setPage();
-  }, [setPage]);
+  }, []);
 
   return (
     <ScrollView >

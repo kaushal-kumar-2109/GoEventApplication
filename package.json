@@ -32,7 +32,8 @@
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
     "realm": "^20.2.0",
-    "rxdb": "^16.19.0"
+    "rxdb": "^16.19.0",
+    "expo-updates": "~0.28.17"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

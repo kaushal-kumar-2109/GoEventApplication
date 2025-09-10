@@ -1,9 +1,9 @@
 // importing user-build componets 
 import { checkInternet } from '../../../utils/checkNetwork';
+import { CREATEUSER } from '../offline/dbHandle/createData';
+import { fetchApi } from '../../../utils/fetchApi';
 
 const CreateNewUser = async (body) => {
-
-    console.log(body.UserEmail);
     const network = await checkInternet();
     if(!network){return false}
 
@@ -21,10 +21,30 @@ const CreateNewUser = async (body) => {
       })
     });
 
-    console.log(resposn);
     if(resposn.status==200){
-      alert("Account Create Sucessfully!");
-      return ({status:true,message:'User Created !'});
+      let res = await fetch("https://goeventserver.onrender.com/goevent/user/email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        UserEmail:body.UserEmail
+      })
+      });
+      const Response = await res.json();
+      const createResponse = await CREATEUSER(Response.res);
+      if(createResponse.status==200||createResponse.status==true){
+        alert("Account Create Sucessfully!");
+        return ({status:true,message:'User Created !'});
+      }
+      else{
+        alert("Account created please login ");
+        return ({status:true,message:'User Created ! Try Login'});
+      }
+    }
+    else{
+      alert("There is problem in server. Try again later.")
+      return({status:false,message:"User not Created dueto server error."})
     }
 }
 

@@ -17,7 +17,6 @@ const sendMail = async (email) => {
 
     if(! await checkInternet()){return false};
 
-    console.log('hereq');
     let res = await fetch("https://goeventserver.onrender.com/goevent/user/email", {
       method: "POST",
       headers: {
@@ -27,11 +26,8 @@ const sendMail = async (email) => {
         UserEmail:email
       })
     });
-    console.log(res);
-    console.log('ok');
+    
     res = await res.json();
-    console.log("ok2");
-    console.log(res);
 
     if(res.status){
       alert("The Email Is Already In Use.");

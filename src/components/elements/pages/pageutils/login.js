@@ -10,6 +10,8 @@ import { CSS } from "../../../styles/basicStyle";
 import { alignItem, colorSchema, display, felx, justifyContent } from "../../../styles/constant";
 import { CreateNewUser } from "../../../../DataBase/online/accountHandler";
 import { sendMail } from "../../../../../utils/sendMail";
+import { RELOADAPP } from "../../../../../utils/reloadApp";
+
 
 const Login = () => {
   const [checkLogin, setCheckLogin] = useState(false);
@@ -35,12 +37,14 @@ const Login = () => {
   const [passwordErr, setPasswordErr] = useState(false);
   const [logPasswordErr, setLogPasswordErr] = useState(false);
 
+
   // Send Otp to email 
   let sendOtp =async () => {
     (!email.trim())?setEmailErr("Email is Required! "):setEmailErr(false);
     let emailPart = email.trim().split('@');
     if('@'+emailPart[1]!='@gmail.com'||!email.trim()){setEmailErr("Enter Valid Email Address! ");return;}
     setEmailEdit(false);
+    alert ("otp will reach on your email soon!");
     const res =await sendMail(email);
     setValidOtp(res.OTP);
   }
@@ -61,7 +65,7 @@ const Login = () => {
     if(isNaN(emailOtp)){setEmailOtpErr('Enter Valid Email Otp! ');return}
     // if(isNaN(number)){setNumberErr("Enter Valid Mobile Number! Without '+91' or '0' ");return}
     // if(isNaN(numberOtp)){setNumberOtpErr('Enter Valid Number Otp! ');return}
-    console.log(validOtp);
+
     if(parseInt(emailOtp)==parseInt(validOtp)){
       console.log('New User Got');
       CreateNewUser({UserName:userName,UserPassword:password,UserEmail:email,UserRole:userType});
@@ -70,6 +74,7 @@ const Login = () => {
       setEmailOtpErr("Enter Valid Otp.");
       return;
     }
+    RELOADAPP();
   };
 
 // submit handler
