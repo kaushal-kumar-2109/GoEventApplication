@@ -93,14 +93,14 @@ const Register = () => {
 
               {/* userType */}
               <View style={inputContainer}>
-                <View style={inputLabel}>
+                <View style={[{ width: "50%"}, display.df, felx.fd_r, alignItem.ali_c]}>
                   <Feather name="user" size={24} />
                   <Text style={inputField}>Type : {userType}</Text>
                 </View>
                 <Picker
                   selectedValue={userType}
                   onValueChange={(itemValue, itemIndex) => setUserType(itemValue)}
-                  style={{ height: 50, width:100,marginLeft:-15 }}
+                  style={{ height: 50, width:"50%",marginLeft:-15 }}
                 >
                   <Picker.Item label="For Vendor" value="vendor" />
                   <Picker.Item label="For User" value="user" />
@@ -110,7 +110,7 @@ const Register = () => {
 
               {/* Email */}
               <View style={inputContainer}>
-                <View style={inputLabel}>
+                <View style={[{ width: "70%"}, display.df, felx.fd_r, alignItem.ali_c]}>
                   <Feather name="mail" size={24} />
                   <TextInput
                     placeholder="Example@gmail.com"
@@ -121,7 +121,10 @@ const Register = () => {
                     style={inputField}
                   />
                 </View>
-                <TouchableOpacity style={button} onPress={()=>{sendOtp()}}><Text style={buttonText}>Get OTP</Text></TouchableOpacity>
+                <View style={Otpbtn}>
+                  <TouchableOpacity style={button} onPress={()=>{sendOtp()}}><Text style={buttonText}>Get OTP</Text></TouchableOpacity>
+                </View>
+
               </View>
               {emailErr && <Text style={errMessage}>🚫 {emailErr}</Text>}
 
@@ -204,8 +207,9 @@ export {Register};
 
 
 // Styling variables
-const inputContainer = [{ width: "80%", borderWidth: 1, borderColor: "#1f1e1e30" }, display.df, felx.fd_r, alignItem.ali_c, justifyContent.jc_sb, CSS["py5"],CSS['px15'], CSS["mt20"]];
-const inputLabel = [{ width: "80%" }, display.df, felx.fd_r, alignItem.ali_c];
+const inputContainer = [{ width: "90%", borderWidth: 0.7, borderColor: "#1f1e1e30"}, display.df, felx.fd_r, alignItem.ali_c, justifyContent.jc_sb, CSS["py5"],CSS['px10'], CSS["mt20"]];
+const inputLabel = [{ width: "100%" }, display.df, felx.fd_r, alignItem.ali_c];
+const Otpbtn =[{width:'auto'}];
 const inputField = [CSS["ml10"], { borderLeftWidth: 1, width: "80%", borderColor: "#1f1e1e30" }, CSS["px10"]];
 const errMessage = { color: "#ff0000ff" };
 const button = [{ backgroundColor: "#0d00fdff", borderRadius: 10 }, CSS["p10"]];

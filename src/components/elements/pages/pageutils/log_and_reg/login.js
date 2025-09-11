@@ -10,6 +10,9 @@ import { alignItem, colorSchema, display, felx, justifyContent } from "../../../
 import { CreateNewUser } from "../../../../../DataBase/online/accountHandler";
 import { sendMail } from "../../../../../../utils/sendMail";
 import { RELOADAPP } from "../../../../../../utils/reloadApp";
+import codegenNativeCommands from "react-native/Libraries/Utilities/codegenNativeCommands";
+import { getUserByEmail,updateUserByEmail } from "../../../../../../utils/fetchApi";
+import { CREATEUSER } from "../../../../../DataBase/offline/dbHandle/createData";
 
 
 const Login = () => {
@@ -23,7 +26,7 @@ const Login = () => {
   const [password, setpassword] = useState("");
   const [femail, setFEmail] = useState('');
   const [emailOtp,setEmailOtp] = useState('');
-  const [fPassword,setFPassword] = ('');
+  const [fPassword,setFPassword] = useState('');
 
   // error states (boolean)
   const [emailErr, setEmailErr] = useState(false);
@@ -35,29 +38,39 @@ const Login = () => {
 // Send Otp to email 
   let sendOtp =async () => {
     (!femail.trim())?setFEmailErr("Email is Required! "):setFEmailErr(false);
+    if(!femail.trim()){return;}
+
     let emailPart = femail.trim().split('@');
     if('@'+emailPart[1]!='@gmail.com'||!femail.trim()){setFEmailErr("Enter Valid Email Address! ");return;}
     setEmailEdit(false);
     alert ("otp will reach on your email soon!");
-    const res =await sendMail(femail,flag='reset');
+    const res =await sendMail(femail,'reset');
     setValidOtp(res.OTP);
   }
 
 // submit handler
   let resetAccount =async () => {
-    (!femail.trim())?setFEmailErr("Email is Required! "):setFEmailErr(false);
-    (!emailOtp.trim())?setEmailOtpErr("Otp is Required! "):setEmailOtpErr(false);
-    (!fPassword.trim())?setFPasswordErr("Password is Required! "):setFPasswordErr(false);
-    if(!email || !password || !emailOtp){
+    if(!femail || !fPassword || !emailOtp){
+      (!femail.trim())?setFEmailErr("Email is Required! "):setFEmailErr(false);
+      (!emailOtp.trim())?setEmailOtpErr("Otp is Required! "):setEmailOtpErr(false);
+      (!fPassword.trim())?setFPasswordErr("Password is Required! "):setFPasswordErr(false);
       return;
     }
-    let emailPart = email.trim().split('@');
-    if('@'+emailPart[1]!='@gmail.com'){setEmailErr("Enter Valid Email Address! ");return;}
+    let emailPart = femail.trim().split('@');
+    if('@'+emailPart[1]!='@gmail.com'){setFEmailErr("Enter Valid Email Address! ");return;}
     if(isNaN(emailOtp)){setEmailOtpErr('Enter Valid Email Otp! ');return}
 
-    alert("Got your data");
     if(parseInt(emailOtp)==parseInt(validOtp)){
-      console.log("Login account => email: ",email," password: ", password);
+      const user =await updateUserByEmail(femail,fPassword);
+      if(user){
+        const createResponse = await CREATEUSER(user);
+        if(createResponse.status==200||createResponse.status){
+          RELOADAPP();
+        }
+      }
+      else{
+        return;
+      }
     }
     else{
       setEmailOtpErr("Otp is Wrong!");
@@ -68,6 +81,7 @@ const Login = () => {
 
 
   let loginAccount =async () => {
+    
     (!email.trim())?setEmailErr("Email is Required! "):setEmailErr(false);
     (!password.trim())?setpasswordErr("Password is Required! "):setpasswordErr(false);
     if(!email || !password){
@@ -76,6 +90,16 @@ const Login = () => {
     let emailPart = email.trim().split('@');
     if('@'+emailPart[1]!='@gmail.com'){setEmailErr("Enter Valid Email Address! ");return;}
 
+    const user = await getUserByEmail(email,password);
+    if(user){
+      const createResponse = await CREATEUSER(user);
+      if(createResponse.status==200||createResponse.status){
+        RELOADAPP();
+      }
+    }
+    else{
+      return;
+    }
   };
 
   return (
@@ -86,7 +110,7 @@ const Login = () => {
             <>
               {/* Email */}
               <View style={inputContainer}>
-                <View style={inputLabel}>
+                <View style={[{ width: "70%"}, display.df, felx.fd_r, alignItem.ali_c]}>
                   <Feather name="mail" size={24} />
                   <TextInput
                     placeholder="Example@gmail.com"
@@ -96,8 +120,11 @@ const Login = () => {
                     editable={emailEdit}
                     style={inputField}
                   />
+                </View >
+                <View style={Otpbtn}>
+                  <TouchableOpacity style={button} onPress={()=>{sendOtp()}}><Text style={buttonText}>Get OTP</Text></TouchableOpacity>
                 </View>
-                <TouchableOpacity style={button} onPress={()=>{sendOtp()}}><Text style={buttonText}>Get OTP</Text></TouchableOpacity>
+        
               </View>
               {femailErr && <Text style={errMessage}>🚫 {femailErr}</Text>}
 
@@ -185,7 +212,7 @@ const Login = () => {
               <View style={[{ marginTop: 40, width: "80%" }]}>
                 <TouchableOpacity
                   style={[{ borderRadius: 10, width: "100%", backgroundColor: "#0d00fdff" }, CSS["p15"], display.df, alignItem.ali_c]}
-                  onPress={()=>{resetAccount()}}
+                  onPress={()=>{resetAccount();}}
                 >
                   <Text style={buttonText}>Reset Account</Text>
                 </TouchableOpacity>
@@ -194,7 +221,7 @@ const Login = () => {
             <View style={[{ marginTop: 40, width: "80%" }]}>
               <TouchableOpacity
                 style={[{ borderRadius: 10, width: "100%", backgroundColor: "#0d00fdff" }, CSS["p15"], display.df, alignItem.ali_c]}
-                onPress={loginAccount}
+                onPress={()=>{loginAccount();}}
               >
                 <Text style={buttonText}>Login Account</Text>
               </TouchableOpacity>
@@ -210,8 +237,9 @@ const Login = () => {
 export { Login };
 
 // Styling variables
-const inputContainer = [{ width: "90%", borderWidth: 1, borderColor: "#1f1e1e30" }, display.df, felx.fd_r, alignItem.ali_c, justifyContent.jc_sb, CSS["py5"],CSS['px15'], CSS["mt20"]];
-const inputLabel = [{ width: "80%" }, display.df, felx.fd_r, alignItem.ali_c];
+const inputContainer = [{ width: "90%", borderWidth: 0.7, borderColor: "#1f1e1e30"}, display.df, felx.fd_r, alignItem.ali_c, justifyContent.jc_sb, CSS["py5"],CSS['px10'], CSS["mt20"]];
+const inputLabel = [{ width: "100%" }, display.df, felx.fd_r, alignItem.ali_c];
+const Otpbtn =[{width:'auto'}];
 const inputField = [CSS["ml10"], { borderLeftWidth: 1, width: "80%", borderColor: "#1f1e1e30" }, CSS["px10"]];
 const errMessage = { color: "#ff0000ff" };
 const button = [{ backgroundColor: "#0d00fdff", borderRadius: 10 }, CSS["p10"]];

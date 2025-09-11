@@ -5,9 +5,11 @@ import { Entypo } from '@expo/vector-icons';
 import { useState } from 'react';
 import { AntDesign } from '@expo/vector-icons';
 
+
 // importing user-build componets { styling }
 import {CSS} from '../../styles/basicStyle'
 import { justifyContent,display,alignItem,felx,colorSchema, position } from '../../styles/constant';
+import { FONTS, ICONS } from '../../styles/global';
 
 // creating variable
 const title =  [CSS['fs25'],CSS['ml10'],colorSchema.title,CSS['fw9']];
@@ -22,9 +24,9 @@ const NavBar = ({ onMenuPress }) => {
          {/* app title and menu logo */}
         <View style={[felx.fd_r,alignItem.ali_c,handleSearch]}>
             <TouchableOpacity onPress={onMenuPress}>
-                <Entypo name='menu' size={30}></Entypo>
+                <Entypo name='menu' size={ICONS.nav}></Entypo>
             </TouchableOpacity>
-            <Text style={title}>GoEvent</Text>
+            <Text style={[FONTS.logo]}>GoEvent</Text>
         </View>
         {/* app title and menu logo end ! */}
 
@@ -33,7 +35,7 @@ const NavBar = ({ onMenuPress }) => {
             <TouchableOpacity style={[colorSchema.bgLighter]} onPress={()=>{setHandleSearch({display:'flex'});setSearchBar({display:'none'});}}>
                 <AntDesign name="arrowleft" size={24} />
             </TouchableOpacity>
-            <TextInput 
+            <TextInput
             style={[CSS['ml15'],{borderBottomWidth:1,width:200}]}
             placeholder='Enter Event,Vendor Name.'>
             </TextInput>
@@ -46,7 +48,7 @@ const NavBar = ({ onMenuPress }) => {
         {/* search Logo  */}
         <View style={[handleSearch]}>
             <TouchableOpacity onPress={()=>{setHandleSearch({display:'none'});setSearchBar({display:'flex'})}}>
-                <FontAwesome name="search" size={30} color="black" />
+                <FontAwesome name="search" size={ICONS.nav} color="black" />
             </TouchableOpacity>
         </View>
         {/* search logo end ! */}

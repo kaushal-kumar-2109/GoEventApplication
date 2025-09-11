@@ -8,9 +8,10 @@ import { useNavigation } from "@react-navigation/native";
 // importing user-build components
 import { CSS } from "../../styles/basicStyle";
 import { alignItem, colorSchema, display, felx } from "../../styles/constant";
+import { TextCOLORS } from "../../styles/global";
 
 // creating variables 
-const title = [CSS["fs25"], colorSchema.title, CSS["fw9"]];
+const title = [CSS["fs25"], TextCOLORS.primary, CSS["fw9"]];
 const linkTitle = [CSS["mt40"]];
 const links = [display.df, felx.fd_r, alignItem.ali_c, CSS["mx5"], CSS["my10"]];
 const linksIconSize = 20;
@@ -31,7 +32,7 @@ const SideMenu = ({ isOpen, onClose }) => {
     outputRange: ["0%", "100%"], // 👈 expands full screen
   });
 
-  const [home,setHome] = useState(colorSchema.title);
+  const [home,setHome] = useState(TextCOLORS.primary);
   const [event,setEvent] = useState({});
   const [vendor,setVendor] = useState({});
   const [user,setUser] = useState({});
@@ -42,25 +43,25 @@ const SideMenu = ({ isOpen, onClose }) => {
   const checkLink = (target) => {
     switch (target) {
       case 'home':
-        setHome(colorSchema.title);setEvent({});setVendor({});setUser({});setAbout({});setContact({});setMore({});
+        setHome(TextCOLORS.primary);setEvent({});setVendor({});setUser({});setAbout({});setContact({});setMore({});
         break;
       case 'event':
-        setHome({});setEvent(colorSchema.title);setVendor({});setUser({});setAbout({});setContact({});setMore({});
+        setHome({});setEvent(TextCOLORS.primary);setVendor({});setUser({});setAbout({});setContact({});setMore({});
         break;
       case 'vendor':
-        setHome({});setEvent({});setVendor(colorSchema.title);setUser({});setAbout({});setContact({});setMore({});
+        setHome({});setEvent({});setVendor(TextCOLORS.primary);setUser({});setAbout({});setContact({});setMore({});
         break;
       case 'user':
-        setHome({});setEvent({});setVendor({});setUser(colorSchema.title);setAbout({});setContact({});setMore({});
+        setHome({});setEvent({});setVendor({});setUser(TextCOLORS.primary);setAbout({});setContact({});setMore({});
         break;
       case 'about':
-        setHome({});setEvent({});setVendor({});setUser({});setAbout(colorSchema.title);setContact({});setMore({});
+        setHome({});setEvent({});setVendor({});setUser({});setAbout(TextCOLORS.primary);setContact({});setMore({});
         break;
       case 'contact':
-        setHome({});setEvent({});setVendor({});setUser({});setAbout({});setContact(colorSchema.title);setMore({});
+        setHome({});setEvent({});setVendor({});setUser({});setAbout({});setContact(TextCOLORS.primary);setMore({});
         break;
       case 'more':
-        setHome({});setEvent({});setVendor({});setUser({});setAbout({});setContact({});setMore(colorSchema.title);
+        setHome({});setEvent({});setVendor({});setUser({});setAbout({});setContact({});setMore(TextCOLORS.primary);
         break;
   
       default:

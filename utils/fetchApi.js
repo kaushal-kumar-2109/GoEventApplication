@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 
 const fetchApi = async (url) => {
   try {
@@ -16,5 +14,53 @@ const fetchApi = async (url) => {
   }
 };
 
+const getUserByEmail = async (email,password) => {
+  let res = await fetch("https://goeventserver.onrender.com/goevent/user/account/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      UserEmail:email,
+      UserPassword:password
+    })
+  });
+  
+  res = await res.json();
 
-export { fetchApi };
+  if(res.status){
+    alert("Got Your Account!");
+    return res.res;
+  }
+  else{
+    alert('Check Email and Password again!');
+    return false
+  }
+}
+
+const updateUserByEmail = async (email,password) => {
+  let res = await fetch("https://goeventserver.onrender.com/goevent/update/user/account", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      UserEmail:email,
+      UserPassword:password
+    })
+  });
+  
+  res = await res.json();
+
+  if(res.status){
+    alert("Password Updated!");
+    return res.res;
+  }
+  else{
+    alert('Password Not Updated Technical err!');
+    return false
+  }
+}
+
+
+export { fetchApi, getUserByEmail, updateUserByEmail };

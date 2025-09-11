@@ -8,10 +8,11 @@ import { useNavigation } from '@react-navigation/native';
 // importing user-build components
 import { alignItem, colorSchema, display, felx, justifyContent } from "../../styles/constant";
 import { CSS } from "../../styles/basicStyle";
+import { TextCOLORS } from "../../styles/global";
 
 const FootBar = () => {
 
-  const [home,setHome] = useState(colorSchema.title);
+  const [home,setHome] = useState(TextCOLORS.primary);
   const [event,setEvent] = useState({});
   const [vendor,setVendor] = useState({});
   const [user,setUser] = useState({});
@@ -19,28 +20,28 @@ const FootBar = () => {
   const checkLink = (target) => {
     switch (target) {
       case 'home':
-        setHome(colorSchema.title);
+        setHome(TextCOLORS.primary);
         setEvent({});
         setVendor({});
         setUser({});
         break;
       case 'event':
         setHome({});
-        setEvent(colorSchema.title);
+        setEvent(TextCOLORS.primary);
         setVendor({});
         setUser({});
         break;
       case 'vendor':
         setHome({});
         setEvent({});
-        setVendor(colorSchema.title);
+        setVendor(TextCOLORS.primary);
         setUser({});
         break;
       case 'user':
         setHome({});
         setEvent({});
         setVendor({});
-        setUser(colorSchema.title);
+        setUser(TextCOLORS.primary);
         break;
   
       default:

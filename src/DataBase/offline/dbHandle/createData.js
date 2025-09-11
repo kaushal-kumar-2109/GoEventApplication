@@ -12,6 +12,7 @@ const CREATEUSER = async (data) => {
   }
   const result = await db.runAsync(`INSERT INTO User VALUES ("${data._id}","${data.UserName}","${data.UserEmail}","${data.UserPassword}","${data.UserRole}","${data.UserCreatedAt}","${data.UserProfile}","${data.UserPhone}");`);
   console.log(result);
+  
   if(result.changes || result){
     return({status:200,mes:'data save!'});
   }

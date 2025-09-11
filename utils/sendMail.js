@@ -17,24 +17,30 @@ const sendMail = async (email,flag=false) => {
 
     if(! await checkInternet()){return false};
 
-    if(!flag){
-      let res = await fetch("https://goeventserver.onrender.com/goevent/user/email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          UserEmail:email
-        })
-      });
+    let res = await fetch("https://goeventserver.onrender.com/goevent/user/email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        UserEmail:email
+      })
+    });
       
-      res = await res.json();
-    
+    res = await res.json();
+
+    if(!flag){
       if(res.status){
         alert("The Email Is Already In Use.");
         return;
       }
+    }else{
+      if(!res.status){
+        alert("No Account Found With This Email.");
+        return;
+      }
     }
+
     const otp = OtpCreater();
     const resposn= await fetch("https://goeventserver.onrender.com/goevent/sendemail", {
       method: "POST",
