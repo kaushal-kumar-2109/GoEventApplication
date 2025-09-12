@@ -14,6 +14,8 @@ import { RELOADAPP } from "../../../../../../utils/reloadApp";
 
 
 const Register = () => {
+  // other states
+  const [loading,setLoading] = useState(false);
 
     // form states
     const [userName, setUserName] = useState("");
@@ -76,6 +78,18 @@ const Register = () => {
     };
 
     return(
+      <ScrollView>
+{loading?
+        <View style={[{height:'100%',width:'100%',display:'flex',justifyContent:'center',alignItems:'center'}]}>
+          {/* <ActivityIndicator size="large" color="#007bff" /> */}
+          <LottieView
+            source={require("../../../../../../assets/loader1.json")} // 👈 use your JSON file
+            autoPlay
+            loop
+            style={{ width: 300, height: 300 }}
+          />
+        </View>
+:
         <View style={[CSS["mt40"], { width: "100%" }, display.df, alignItem.ali_c]}>
             {/* Username */}
               <View style={inputContainer}>
@@ -200,6 +214,8 @@ const Register = () => {
             
             </View>
         </View>
+}
+      </ScrollView>
     );
 }
 

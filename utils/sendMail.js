@@ -1,5 +1,5 @@
-
 import { checkInternet } from "./checkNetwork";
+import { APIs } from "./routers";
 
 const OtpCreater = () => {
     const char = '1234567890';
@@ -17,7 +17,7 @@ const sendMail = async (email,flag=false) => {
 
     if(! await checkInternet()){return false};
 
-    let res = await fetch("https://goeventserver.onrender.com/goevent/user/email", {
+    let res = await fetch(APIs.getUesrByEmail, {           //https://goeventserver.onrender.com/goevent/user/email
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -42,7 +42,7 @@ const sendMail = async (email,flag=false) => {
     }
 
     const otp = OtpCreater();
-    const resposn= await fetch("https://goeventserver.onrender.com/goevent/sendemail", {
+    const resposn= await fetch(APIs.sendOtpByEmail, {       // https://goeventserver.onrender.com/goevent/sendemail
       method: "POST",
       headers: {
         "Content-Type": "application/json"

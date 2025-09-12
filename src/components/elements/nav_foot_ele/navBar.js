@@ -15,10 +15,10 @@ import { FONTS, ICONS } from '../../styles/global';
 const title =  [CSS['fs25'],CSS['ml10'],colorSchema.title,CSS['fw9']];
 
 
-const NavBar = ({ onMenuPress }) => {
-
+const NavBar = ({ onMenuPress,searchVariable }) => {
     const [searchBar,setSearchBar] = useState({display:'none'});
     const [handleSearch,setHandleSearch] = useState({display:'flex'});
+
   return (
     <View className="navBar" style={[display.df,felx.fd_r,justifyContent.jc_sb,alignItem.ali_c,CSS['p10'],colorSchema.bgLighter,SS.nav]}>
          {/* app title and menu logo */}
@@ -46,11 +46,14 @@ const NavBar = ({ onMenuPress }) => {
         {/* search bar and search button end */}
 
         {/* search Logo  */}
+        {searchVariable?
         <View style={[handleSearch]}>
             <TouchableOpacity onPress={()=>{setHandleSearch({display:'none'});setSearchBar({display:'flex'})}}>
                 <FontAwesome name="search" size={ICONS.nav} color="black" />
             </TouchableOpacity>
         </View>
+        :<View></View>
+        }
         {/* search logo end ! */}
     </View>
   );

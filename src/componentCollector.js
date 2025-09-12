@@ -25,13 +25,24 @@ const Stack = createNativeStackNavigator();
 
 export default function Collector() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSearchShow , setIsSearchShow] = useState(false);
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      onStateChange={(state) => {
+        const currentRoute = state.routes[state.index].name;
+        if (currentRoute === "Event" || currentRoute === "Vendor") {
+          setIsSearchShow(true);
+          console.log('done');
+        } else {
+          setIsSearchShow(false);
+        }
+      }}
+    >
       <View style={[SS.body]}>
-        <NavBar onMenuPress={() => setIsSidebarOpen(true)}/>
+        <NavBar onMenuPress={() => setIsSidebarOpen(true)} searchVariable={isSearchShow}/>
         <SideMenu isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)}/>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Home" component={Home}/>
           <Stack.Screen name="Event" component={Event} />
           <Stack.Screen name="Vendor" component={Vendor} />
           <Stack.Screen name="User" component={User} />

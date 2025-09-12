@@ -1,4 +1,4 @@
-
+import { APIs } from "./routers";
 const fetchApi = async (url) => {
   try {
     const response = await fetch(url);
@@ -15,7 +15,7 @@ const fetchApi = async (url) => {
 };
 
 const getUserByEmail = async (email,password) => {
-  let res = await fetch("https://goeventserver.onrender.com/goevent/user/account/login", {
+  let res = await fetch(APIs.getUserByEmail_Password, {      //"https://goeventserver.onrender.com/goevent/user/account/login"
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -39,7 +39,7 @@ const getUserByEmail = async (email,password) => {
 }
 
 const updateUserByEmail = async (email,password) => {
-  let res = await fetch("https://goeventserver.onrender.com/goevent/update/user/account", {
+  let res = await fetch(APIs.updateEmailPassword, {      //https://goeventserver.onrender.com/goevent/update/user/account
     method: "POST",
     headers: {
       "Content-Type": "application/json"

@@ -9,6 +9,9 @@ import { useNavigation } from "@react-navigation/native";
 import { CSS } from "../../styles/basicStyle";
 import { alignItem, colorSchema, display, felx } from "../../styles/constant";
 import { TextCOLORS } from "../../styles/global";
+import { DataBase } from "../../../../utils/GlobalVariable";
+import { DELETEUSER } from "../../../DataBase/offline/dbHandle/deleteData";
+import { RELOADAPP } from "../../../../utils/reloadApp";
 
 // creating variables 
 const title = [CSS["fs25"], TextCOLORS.primary, CSS["fw9"]];
@@ -18,6 +21,12 @@ const linksIconSize = 20;
 const linkName = [CSS["fs18"], CSS["fw6"], CSS["ml8"]];
 
 const SideMenu = ({ isOpen, onClose }) => {
+  const handleLogOut = () => {
+    const res = DELETEUSER(DataBase.user.id);
+    if(res.chages || res.chages>1){
+      RELOADAPP();
+    }
+  }
     // creating animation 
   const widthAnim = useRef(new Animated.Value(0)).current;
   useEffect(() => {
@@ -139,15 +148,21 @@ const SideMenu = ({ isOpen, onClose }) => {
         </View>
 
         {/* logout */}
+{DataBase.user!=null?
         <View>
           <Text style={linkTitle}>LOGOUT ACCOUNT</Text>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={()=>{handleLogOut();}}
+          >
             <View style={links}>
               <MaterialIcons name="logout" size={linksIconSize} color="black" />
               <Text style={linkName}>Logout</Text>
             </View>
           </TouchableOpacity>
         </View>
+:
+        <View></View>
+}
       </View>
     </Animated.View>
   );

@@ -7,12 +7,12 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 // importing user-built components 
 import { CSS } from "../../../../styles/basicStyle";
 import { alignItem, colorSchema, display, felx, justifyContent } from "../../../../styles/constant";
-import { CreateNewUser } from "../../../../../DataBase/online/accountHandler";
 import { sendMail } from "../../../../../../utils/sendMail";
 import { RELOADAPP } from "../../../../../../utils/reloadApp";
-import codegenNativeCommands from "react-native/Libraries/Utilities/codegenNativeCommands";
 import { getUserByEmail,updateUserByEmail } from "../../../../../../utils/fetchApi";
 import { CREATEUSER } from "../../../../../DataBase/offline/dbHandle/createData";
+import LottieView from "lottie-react-native";
+import { DataBase } from "../../../../../../utils/GlobalVariable";
 
 
 const Login = () => {
@@ -20,6 +20,7 @@ const Login = () => {
   const [forgetPassword, setForgetPassword] = useState(false);
   const [emailEdit,setEmailEdit] = useState(true);
   const [validOtp,setValidOtp] = useState(false);
+  const [loadings,setLoadings] = useState(false);
 
   // form states
   const [email, setEmail] = useState("");
@@ -59,20 +60,23 @@ const Login = () => {
     let emailPart = femail.trim().split('@');
     if('@'+emailPart[1]!='@gmail.com'){setFEmailErr("Enter Valid Email Address! ");return;}
     if(isNaN(emailOtp)){setEmailOtpErr('Enter Valid Email Otp! ');return}
-
+    setLoadings(true);
     if(parseInt(emailOtp)==parseInt(validOtp)){
       const user =await updateUserByEmail(femail,fPassword);
       if(user){
         const createResponse = await CREATEUSER(user);
         if(createResponse.status==200||createResponse.status){
+          setLoadings(false)
           RELOADAPP();
         }
       }
       else{
+        setLoadings(false);
         return;
       }
     }
     else{
+      setLoadings(false);
       setEmailOtpErr("Otp is Wrong!");
       return;
     }
@@ -90,20 +94,34 @@ const Login = () => {
     let emailPart = email.trim().split('@');
     if('@'+emailPart[1]!='@gmail.com'){setEmailErr("Enter Valid Email Address! ");return;}
 
+    setLoadings(true);
     const user = await getUserByEmail(email,password);
     if(user){
       const createResponse = await CREATEUSER(user);
       if(createResponse.status==200||createResponse.status){
+        setLoadings(false);
         RELOADAPP();
       }
     }
     else{
+      setLoadings(false);
       return;
     }
   };
 
   return (
     <ScrollView>
+{loadings?
+      <View style={[{height:'100%',width:'100%',display:'flex',justifyContent:'center',alignItems:'center'}]}>
+        {/* <ActivityIndicator size="large" color="#007bff" /> */}
+        <LottieView
+          source={require("../../../../../../assets/loader1.json")} // 👈 use your JSON file
+          autoPlay
+          loop
+          style={{ width: 300, height: 300 }}
+        />
+      </View>
+:
       <View style={[CSS["px5"], CSS["py30"], display.df, alignItem.ali_c, justifyContent.jc_c]}>
         <View style={[CSS["mt40"], { width: "100%" }, display.df, alignItem.ali_c]}>
           {forgetPassword?
@@ -230,6 +248,7 @@ const Login = () => {
 
         </View>
       </View>
+}
     </ScrollView>
   );
 };
