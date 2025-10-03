@@ -1,19 +1,78 @@
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import { UserSetup } from './src/AccountCreate/collector';
+import { useEffect, useState } from 'react';
+import { GETUSER } from './src/Database/Offline/oprations/Read';
+import Application from './src/Application/collector';
+import LottieView from 'lottie-react-native';
+import { getEventsData } from './utils/eventApis/fetchApis';
+import { AddToOffline } from './OfflineDataHandle/events';
 
 export default function App() {
+
+  // user variable 
+  const [getMainPageStack,setMainPageStack] = useState("");
+  const [getLoader,setLoader] = useState(true);
+
+  const [getUserData,setUserData] = useState(false);
+
+  const checkUser = async () => {
+    const data = await GETUSER();
+    if(data && data[0]){
+      setUserData(data[0]);
+      setMainPageStack(true);
+    }else{
+      setMainPageStack(false);
+    }
+    
+    setLoader(false);
+  }
+
+  const setupApp = async () => {
+    const res = await getEventsData({data:"none"});
+    const response = await AddToOffline(res);
+    console.log(response);
+  } 
+
+  useEffect(()=>{
+    checkUser();
+    setupApp();
+  },[setMainPageStack]);
+
   return (
+    <>
+{getLoader?
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <LottieView
+        
+        autoPlay
+        loop
+        style={{ width: 150, height: 150 }}
+        source={require('./assets/loader/l1.json')} // put your lottie file in assets
+      />
     </View>
+:
+  <>
+    {(getMainPageStack=='none' || getMainPageStack == false)
+    ?
+      <View style={styles.container}>
+        <UserSetup setMainPageStack={setMainPageStack}></UserSetup>
+      </View>
+    :
+      <View style={styles.container}>
+        <Application getUserData={getUserData}></Application>
+      </View>
+    }
+  </>
+}
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    paddingTop:'10%',
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -1,0 +1,4 @@
+const USERSETUPDATA = {};
+const USERDATA = [];
+
+export {USERSETUPDATA,USERDATA};
