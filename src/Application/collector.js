@@ -6,44 +6,46 @@ import {VendorPage} from "./components/vendor";
 import {UserPage} from "./components/user";
 import { EventPage } from "./components/event";
 import { SettingPage } from "./components/setting";
-import { GETEVENTS,GETSAVED } from "../Database/Offline/oprations/Read";
+import { GETDATASETS, GETEVENTS,GETSAVED } from "../Database/Offline/oprations/Read";
 import { useSafeAreaFrame } from "react-native-safe-area-context";
 import { SavedPage } from "./components/saved";
 
-export default function Application( getUserData) {
+export default function Application({ getAppData,setAppData }) {
 
   const [getPageStack,setPageStack] = useState("home");
   const [getEvents,setEvents] = useState(false);
+  const [getDataSet,setDataSet] = useState({});
 
-  const GetEvents = async () => {
-    const rows = await GETEVENTS();
-    setEvents(rows);
-  }
-  
+  // const GetDataSets = async () => {
+  //   const rows = await GETEVENTS();
+  //   // const getDataSet = await GETDATASETS.GET_DATA_SET(getUserData.getUserData.id);
+  //   // console.log(getDataSet);
+  //   setEvents(rows);
+  // }
 
-  useEffect(()=>{
-    GetEvents();
-  },[])
+  // useEffect(()=>{
+  //   GetDataSets();
+  // },[])
 
   return (
     <>
       {getPageStack=="user" &&
-        <UserPage getUserData={getUserData} setPageStack={setPageStack} getPageStack={getPageStack}></UserPage>
+        <UserPage getAppData={getAppData} setAppData={setAppData} setPageStack={setPageStack} getPageStack={getPageStack}></UserPage>
       }
       {getPageStack=="event" &&
-        <EventPage getUserData={getUserData} getEvents={getEvents} setPageStack={setPageStack} getPageStack={getPageStack}></EventPage>
+        <EventPage getAppData={getAppData} setAppData={setAppData} setPageStack={setPageStack} getPageStack={getPageStack}></EventPage>
       }
       {getPageStack=="home" &&
-        <HomePage getUserData={getUserData} setPageStack={setPageStack} getPageStack={getPageStack}></HomePage>
+        <HomePage getAppData={getAppData} setAppData={setAppData} setPageStack={setPageStack} getPageStack={getPageStack}></HomePage>
       }
       {getPageStack=="vendor" &&
-        <VendorPage getUserData={getUserData} setPageStack={setPageStack} getPageStack={getPageStack}></VendorPage>
+        <VendorPage getAppData={getAppData} setAppData={setAppData} setPageStack={setPageStack} getPageStack={getPageStack}></VendorPage>
       }
       {getPageStack=="setting" &&
-        <SettingPage getUserData={getUserData} setPageStack={setPageStack} getPageStack={getPageStack}></SettingPage>
+        <SettingPage getAppData={getAppData} setAppData={setAppData} setPageStack={setPageStack} getPageStack={getPageStack}></SettingPage>
       }
       {getPageStack=='saved'&&
-        <SavedPage getUserData={getUserData} setPageStack={setPageStack} getPageStack={getPageStack}></SavedPage>
+        <SavedPage getAppData={getAppData} setAppData={setAppData} setPageStack={setPageStack} getPageStack={getPageStack}></SavedPage>
       }
     </>
   );

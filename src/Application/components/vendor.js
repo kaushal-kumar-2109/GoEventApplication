@@ -12,14 +12,14 @@ import { ActionCard } from '../elements/ActionCard';
 import { LinearColor } from '../../../public/styles/global';
 import {VendorCard} from '../elements/VendorCard';
 
-const VendorPage = ({getUserData,setPageStack,getPageStack}) => {
+const VendorPage = ({getAppData,setAppData,setPageStack,getPageStack}) => {
     const [getSideBar,setSideBar] = useState(false);
     return(
         <>
         <SafeAreaView style={[styles.container]}>
-            <NavBar setPageStack={setPageStack} getUserData={getUserData} title={'Vendors'} style={[{position:'fixed'}]} setSideBar={setSideBar}></NavBar>
+            <NavBar setPageStack={setPageStack} getAppData={getAppData} title={'Vendors'} style={[{position:'fixed'}]} setSideBar={setSideBar}></NavBar>
 {getSideBar && 
-            <SideBar setSideBar={setSideBar} getPageStack={getPageStack} setPageStack={setPageStack}></SideBar>
+            <SideBar setSideBar={setSideBar} getUserData={getAppData.UserData} getPageStack={getPageStack} setPageStack={setPageStack}></SideBar>
 }
             <ScrollView>
 

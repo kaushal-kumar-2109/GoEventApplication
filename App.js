@@ -1,11 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { UserSetup } from './src/AccountCreate/collector';
 import { useEffect, useState } from 'react';
-import { GETUSER } from './src/Database/Offline/oprations/Read';
+import { GETDATASETS, GETUSER } from './src/Database/Offline/oprations/Read';
 import Application from './src/Application/collector';
 import LottieView from 'lottie-react-native';
 import { getEventsData } from './utils/eventApis/fetchApis';
 import { AddToOffline } from './OfflineDataHandle/events';
+
+const GETDATASET = new GETDATASETS();
 
 export default function App() {
 
@@ -13,12 +15,14 @@ export default function App() {
   const [getMainPageStack,setMainPageStack] = useState("");
   const [getLoader,setLoader] = useState(true);
 
-  const [getUserData,setUserData] = useState(false);
+  const [getAppData,setAppData] = useState(false);
 
   const checkUser = async () => {
     const data = await GETUSER();
     if(data && data[0]){
-      setUserData(data[0]);
+      GETDATASET.check();
+      const dataSet =await GETDATASET.fetchDataSet(data[0].id);
+      setAppData(dataSet);
       setMainPageStack(true);
     }else{
       setMainPageStack(false);
@@ -59,7 +63,7 @@ export default function App() {
       </View>
     :
       <View style={styles.container}>
-        <Application getUserData={getUserData}></Application>
+        <Application getAppData={getAppData} setAppData={setAppData}></Application>
       </View>
     }
   </>

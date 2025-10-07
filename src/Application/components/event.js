@@ -1,8 +1,5 @@
 import { View,Text,StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Entypo from '@expo/vector-icons/Entypo';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import {LinearGradient} from 'expo-linear-gradient'
 import { useEffect, useState } from 'react';
 
 // importing user-build components
@@ -10,36 +7,45 @@ import { NavBar } from '../comman_component/navBar';
 import { FootBar } from '../comman_component/footer';
 import { SideBar } from '../comman_component/sideBar';
 import { ActionCard } from '../elements/ActionCard';
-import { COLORS, LinearColor, TextCOLORS } from '../../../public/styles/global';
+import { LinearColor } from '../../../public/styles/global';
 import { EventCard } from '../elements/EventCard';
 
-const EventPage = ({getUserData,setPageStack,getPageStack,getEvents}) => {
+const EventPage = ({getAppData,setAppData,setPageStack,getPageStack}) => {
 
     const [getSideBar,setSideBar]=useState(false);
     const [getSearchValue,setSearchValue] = useState('');
     const [getFilteredEvent,setFilteredEvents] = useState([]);
+    const [getFreeEvent,setFreeEvent] = useState([]);
+    // console.log(getAppData.SavedEvent_Vendor_Data);
 
     const getSerachResult = () => {
         if (!getSearchValue || getSearchValue.trim() === "") {
-            setFilteredEvents(getEvents);
+            setFilteredEvents(getAppData.EventData);
         } else {
-            const filtered = getEvents.filter(event =>
+            const filtered = getAppData.EventData.filter(event =>
                 event.EVENTNAME.toLowerCase().includes(getSearchValue.toLowerCase())
             );
             setFilteredEvents(filtered);
         }
     }
+    const setEvents = async () =>{
+        const FreeEvent = getAppData.EventData.filter(event =>
+            event.EVENTAMOUNT === '0'
+        );
+        setFreeEvent(FreeEvent);
+    }
     // getSerachResult();
     useEffect(()=>{
         getSerachResult();
+        setEvents();
     },[])
 
     return(
         <>
         <SafeAreaView style={[styles.container]}>
-            <NavBar setPageStack={setPageStack} getUserData={getUserData} getResult={getSerachResult} setSearchValue={setSearchValue} setSideBar={setSideBar} title={'Events'} style={[{position:'fixed'}]}></NavBar>
+            <NavBar setPageStack={setPageStack} getAppData={getAppData} getResult={getSerachResult} setSearchValue={setSearchValue} setSideBar={setSideBar} title={'Events'} style={[{position:'fixed'}]}></NavBar>
 {getSideBar && 
-            <SideBar setSideBar={setSideBar} getPageStack={getPageStack} setPageStack={setPageStack}></SideBar>
+            <SideBar setSideBar={setSideBar} getUserData={getAppData.UserData} getPageStack={getPageStack} setPageStack={setPageStack}></SideBar>
 }
             <ScrollView>
 
@@ -57,43 +63,73 @@ const EventPage = ({getUserData,setPageStack,getPageStack,getEvents}) => {
                     </ScrollView>
                 </View>
 
+
+
 {/* Trending Events area  */}
                 <View style={[{marginTop:30},{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between'}]}>
                     <Text style={[{color:'#8d8a8aff',fontWeight:800}]}> Trending Events</Text>
 
-                    <TouchableOpacity style={[{display:'flex',flexDirection:'row',alignItems:'center',marginRight:8}]}>
+                    {/* <TouchableOpacity style={[{display:'flex',flexDirection:'row',alignItems:'center',marginRight:8}]}>
                         <Text style={[{color:'#8d8a8aff',fontWeight:800,marginRight:5}]}>Show all</Text>
                         <AntDesign name="double-right" size={12} color="'#8d8a8aff" />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
-                <View style={[{alignItems:'center'}]}>
+                <ScrollView horizontal={true}>
 {getFilteredEvent && getFilteredEvent.length > 0
 ?(
     getFilteredEvent.map((event,index)=>(
-        <EventCard key={event._id||index} DATA={event}></EventCard>
+        <EventCard key={event._id||index} DATA={event} color={'#686666ff'}></EventCard>
     ))
 ):(
                     <View><Text>No Event Found!</Text></View>
 )}
+                </ScrollView>
+
+
+{/* Free Events area  */}
+                <View style={[{marginTop:30},{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between'}]}>
+                    <Text style={[{color:'#8d8a8aff',fontWeight:800}]}> Free Events</Text>
+
+                    {/* <TouchableOpacity style={[{display:'flex',flexDirection:'row',alignItems:'center',marginRight:8}]}>
+                        <Text style={[{color:'#8d8a8aff',fontWeight:800,marginRight:5}]}>Show all</Text>
+                        <AntDesign name="double-right" size={12} color="'#8d8a8aff" />
+                    </TouchableOpacity> */}
                 </View>
+                <ScrollView horizontal={true}>
+{getFreeEvent && getFreeEvent.length > 0
+?(
+    getFreeEvent.map((event,index)=>(
 
-                {/* <View style={[{marginVertical:30,display:'flex',flexDirection:'row',justifyContent:'space-between',paddingHorizontal:8}]}>
-                    
-                    <TouchableOpacity>
-                        <View style={[{display:'flex',flexDirection:'row',alignItems:'center'}]}>
-                            <AntDesign name="double-left" size={12} color="#8d8a8aff" />
-                            <Text style={[{color:'#8d8a8aff',fontWeight:800,marginLeft:5}]}>Privious</Text>
-                        </View>
-                    </TouchableOpacity>
+        <EventCard key={event._id||index} DATA={event} color={'#686666ff'}></EventCard>
+    ))
+):(
+                    <View><Text>No Event Found!</Text></View>
+)}
+                </ScrollView>
 
-                    <TouchableOpacity>
-                        <View style={[{display:'flex',flexDirection:'row',alignItems:'center'}]}>
-                            <Text style={[{color:'#8d8a8aff',fontWeight:800,marginRight:5}]}>Next</Text>
-                            <AntDesign name="double-right" size={12} color="#8d8a8aff" />
-                        </View>
-                    </TouchableOpacity>
-                    
-                </View> */}
+
+{/* Saved Events area  */}
+{getAppData.SavedEvent_Vendor_Data && getAppData.SavedEvent_Vendor_Data.length>0 &&
+                <View style={[{marginTop:30},{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between'}]}>
+                    <Text style={[{color:'#8d8a8aff',fontWeight:800}]}> Saved Events</Text>
+
+                    {/* <TouchableOpacity style={[{display:'flex',flexDirection:'row',alignItems:'center',marginRight:8}]}>
+                        <Text style={[{color:'#8d8a8aff',fontWeight:800,marginRight:5}]}>Show all</Text>
+                        <AntDesign name="double-right" size={12} color="'#8d8a8aff" />
+                    </TouchableOpacity> */}
+                </View>
+}
+                <ScrollView horizontal={true}>
+{getAppData.SavedEvent_Vendor_Data && getAppData.SavedEvent_Vendor_Data.length > 0
+?(
+    getAppData.SavedEvent_Vendor_Data.map((event,index)=>(
+        <EventCard key={event._id||index} DATA={event} color={'#e6ea0cff'}></EventCard>
+    ))
+):(
+                    <></>
+)}
+                </ScrollView>
+
 
 
             </ScrollView>
@@ -102,7 +138,6 @@ const EventPage = ({getUserData,setPageStack,getPageStack,getEvents}) => {
         </>
     )
 }
-
 export {EventPage};
 
 const styles = StyleSheet.create({

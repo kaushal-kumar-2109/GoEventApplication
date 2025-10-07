@@ -10,20 +10,9 @@ import { COLORS, FONTS } from '../../../public/styles/global';
 import { GETSAVED } from '../../Database/Offline/oprations/Read';
 import { useEffect, useState } from 'react';
 
-const NavBar = ({setPageStack,getUserData,title,setSideBar,getSearchValue,setSearchValue,getResult}) => {
+const NavBar = ({setPageStack,getAppData,title,setSideBar,getSearchValue,setSearchValue,getResult}) => {
 
     const [getSearchBar,setSearchBar] = useState(false);
-    const [getSaved,setSaved] = useState(false);
-    // const [getSearchValue,setSearchValues] = useState("");
-
-    const setNav = async () => {
-        const rows = await GETSAVED(getUserData.getUserData.id);
-        setSaved(rows);
-    }
-
-    useEffect(()=>{
-        setNav();
-    },[])
 
     return(
         <>
@@ -83,7 +72,7 @@ const NavBar = ({setPageStack,getUserData,title,setSideBar,getSearchValue,setSea
                     <Text
                         style={[{position:'absolute',top:-8,right:-6,borderRadius:50,backgroundColor:'#f8e42bff',height:15,width:15,textAlign:"center",fontSize:10}]}
                     >
-                        {getSaved.length}
+                        {getAppData.SavedEvent_Vendor_list.length}
                     </Text>
                 </TouchableOpacity>
 }

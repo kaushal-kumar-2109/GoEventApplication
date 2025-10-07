@@ -10,7 +10,6 @@ import { sendEmail } from "../../../utils/apis/sendMail";
 import { getUserData } from "../../../utils/apis/fetchApis";
 import { updateData, uploadData } from "../../../utils/apis/handleDataChnage";
 import { CREATEUSER } from "../../Database/Offline/oprations/Create";
-import { GETUSER } from "../../Database/Offline/oprations/Read";
 import { RELOADAPP } from "../../../utils/function/reloadApp";
 
 const Verification = ({ setPageStack,setMainPageStack}) => {

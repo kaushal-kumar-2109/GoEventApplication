@@ -1,4 +1,4 @@
-const HOST_NETWORK_PATH = 'http://10.176.209.18:3000';
+const HOST_NETWORK_PATH = 'http://10.117.114.18:3000';
 // http://localhost:3000/GoEvent/User
 
 const APIs = {

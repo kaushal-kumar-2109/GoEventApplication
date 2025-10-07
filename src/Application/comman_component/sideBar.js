@@ -5,7 +5,8 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useState,useEffect } from "react";
-const SideBar = ({setSideBar,getPageStack,setPageStack}) => {
+import { DELETEUSER } from "../../Database/Offline/oprations/Delete";
+const SideBar = ({getUserData,setSideBar,getPageStack,setPageStack}) => {
 
     const [getHomeColor,setHomeColor] = useState('#6B7280');
     const [getEventColor,setEventColor] = useState('#6B7280');
@@ -29,7 +30,7 @@ const SideBar = ({setSideBar,getPageStack,setPageStack}) => {
         <>
         <View style={[{position:'absolute',top:0,left:0,backgroundColor:'#e1dfdf6d',width:'100%',height:'100%',zIndex:1}]}>
             
-            <View style={[{width:'80%',backgroundColor:"#FFFFFF",height:'100%'}]}>
+            <View style={[{width:'80%',backgroundColor:"#FFFFFF",height:'100%',position:'relative'}]}>
                 <TouchableOpacity
                 style={[{marginTop:50,width:'100%', display:'flex',alignItems:'flex-end',paddingHorizontal:20}]}
                 onPress={()=>setSideBar(false)}
@@ -43,8 +44,8 @@ const SideBar = ({setSideBar,getPageStack,setPageStack}) => {
                         style={{ width: 150, height: 150 }}
                         resizeMode="contain"
                     ></Image>
-                    <Text style={[{fontSize:17,fontWeight:600}]}>Kishore Kumar</Text>
-                    <Text style={[{color:'#6d6b6bff',fontWeight:600}]}>Nothing21092003@gmail.com</Text>
+                    <Text style={[{fontSize:17,fontWeight:600}]}>{getUserData.name}</Text>
+                    <Text style={[{color:'#6d6b6bff',fontWeight:600}]}>{getUserData.email}</Text>
                 </View>
 
                 <Text style={[{marginLeft:10,fontWeight:600,color:'#969696ff',marginTop:50}]}>Main Menu</Text>
@@ -89,6 +90,15 @@ const SideBar = ({setSideBar,getPageStack,setPageStack}) => {
                         <Text style={[{fontSize:17,fontWeight:'600',color:getSettingColor,marginLeft:5}]}>Settings</Text>
                     </TouchableOpacity>
                 </View>
+
+                
+                <TouchableOpacity
+                    onPress={()=>DELETEUSER(getUserData.id)}
+                    style={[{position:'absolute',bottom:20,width:'100%',alignItems:'center'}]} 
+                >
+                    <Text style={[{fontSize:17,fontWeight:'600',color:getSettingColor}]}>Logout</Text>
+                </TouchableOpacity>
+                
 
             </View>
 

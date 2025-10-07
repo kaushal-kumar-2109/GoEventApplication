@@ -7,36 +7,25 @@ import { NavBar } from '../comman_component/navBar';
 import { FootBar } from '../comman_component/footer';
 import { SideBar } from '../comman_component/sideBar';
 import { EventCard } from '../elements/EventCard';
-import { GETSAVEDLIST } from '../../Database/Offline/oprations/Read';
 
-const SavedPage = ({getUserData,setPageStack,getPageStack,getEvents}) => {
+const SavedPage = ({getAppData,setAppData,setPageStack,getPageStack}) => {
 
     const [getSideBar,setSideBar]=useState(false);
-    const [getFilteredEvent,setFilteredEvents] = useState([]);
 
-    const saveToBookMark = async (id) => {
-        const res = await GETSAVEDLIST(id);
-        setFilteredEvents(res);
-    }
-
-    // getSerachResult();
-    useEffect(()=>{
-        saveToBookMark(getUserData.getUserData.id);
-    },[])
 
     return(
         <>
         <SafeAreaView style={[styles.container]}>
-            <NavBar setPageStack={setPageStack} getUserData={getUserData} setSideBar={setSideBar} title={'Saved'} style={[{position:'fixed'}]}></NavBar>
+            <NavBar setPageStack={setPageStack} getAppData={getAppData} setSideBar={setSideBar} title={'Saved'} style={[{position:'fixed'}]}></NavBar>
 {getSideBar && 
-            <SideBar setSideBar={setSideBar} getPageStack={getPageStack} setPageStack={setPageStack}></SideBar>
+            <SideBar setSideBar={setSideBar} getUserData={getAppData.UserData} getPageStack={getPageStack} setPageStack={setPageStack}></SideBar>
 }
             <ScrollView>
 
             <View style={[{alignItems:'center'}]}>
-{getFilteredEvent && getFilteredEvent.length > 0
+{getAppData.SavedEvent_Vendor_Data && getAppData.SavedEvent_Vendor_Data.length > 0
 ?(
-    getFilteredEvent.map((event,index)=>(
+    getAppData.SavedEvent_Vendor_Data.map((event,index)=>(
         <EventCard key={event._id||index} DATA={event}></EventCard>
     ))
 ):(
