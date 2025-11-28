@@ -13,7 +13,7 @@ import { ForGotPassword } from "./forgetPassword";
 import { USERSETUPDATA } from "../../../utils/global";
 
 // importing functions 
-import { getUserData } from "../../../utils/apis/fetchApis";
+import { GET_USER_BY_EMAIL } from "../../Database/online/fetchApis";
 
 const LoginPage = ({setPageStack}) => {
 
@@ -45,7 +45,21 @@ const LoginPage = ({setPageStack}) => {
 
         USERSETUPDATA['Data']={UserEmail:getUserEmail,UserPassword:getUserPassword,task:'login'};
 
-        setPageStack(pageStack => [...pageStack,'verification']);
+        // console.log(USERSETUPDATA['Data']);
+
+        const result = await GET_USER_BY_EMAIL(USERSETUPDATA['Data']);
+        if(result.STATUS != 200){
+            setUserEmailErr(result.MES);
+            return;
+        }
+        if(result.DATA[0].USERPASS===getUserPassword){
+            USERSETUPDATA['ActalData']=result.DATA[0];
+            setPageStack(pageStack => [...pageStack,'verification']);
+        }
+        else{
+            setUserPasswordErr("Wrong Password !");
+            return;
+        }
 
         // const data = await getUserData({userEmail:getUserEmail,userPassword:getUserPassword,task:'login'});
         
@@ -145,7 +159,7 @@ const LoginPage = ({setPageStack}) => {
                             style={[styles.loginBtn]}
                         >
                             <View></View>
-                            <Text style={[{color:'#ffffff'}]}>Login</Text>
+                            <Text style={[{color:'#ffffff'}]}>Login </Text>
                             <View style={[{backgroundColor:COLORS.secondaryBtn,borderRadius:'50%'}]}>
                                 <Ionicons name="arrow-forward" size={24} color="white" />
                             </View>

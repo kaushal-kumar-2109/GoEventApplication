@@ -10,6 +10,7 @@ import { useState } from "react";
 // importing user-build componentes 
 import { COLORS, FONTS } from "../../../public/styles/global";
 import { USERSETUPDATA } from "../../../utils/global";
+import { GET_USER_BY_EMAIL } from "../../Database/online/fetchApis";
 
 const SignupPage = ({setPageStack}) => {
 
@@ -29,7 +30,7 @@ const SignupPage = ({setPageStack}) => {
     const [getUserPasswordErr,setUserPasswordErr] = useState(false);
 
     // function
-    const createAccount = () => {
+    const createAccount = async () => {
         (getUserEmail.trim()=='')?setUserEmailErr('Email is Required❗'):setUserEmailErr(false);
         (getUserName.trim()=='')?setUserNameErr('User Name is Required❗'):setUserNameErr(false);
         (getUserNumber.trim()=='')?setUserNumberErr('User Phone Number is Required❗'):setUserNumberErr(false);
@@ -47,6 +48,13 @@ const SignupPage = ({setPageStack}) => {
             return;
         }
         USERSETUPDATA['Data']={UserEmail:getUserEmail,UserName:getUserName,UserNumber:getUserNumber,UserPassword:getUserPassword,task:'signup'}
+        
+        const result = await GET_USER_BY_EMAIL(USERSETUPDATA['Data']);
+        if(result.STATUS != 404){
+            setUserEmailErr(result.MES);
+            return;
+        }
+
         // setGotData({userEmail:getUserEmail,userName:getUserName,userNumber:getUserNumber,userPassword:getUserPassword,task:'signup'});
         setPageStack(pageStack => [...pageStack,'verification']);
     }

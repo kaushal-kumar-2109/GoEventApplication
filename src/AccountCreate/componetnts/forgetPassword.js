@@ -10,6 +10,7 @@ import { useState } from "react";
 // importing user-build componentes 
 import { COLORS,FONTS } from "../../../public/styles/global";
 import { USERSETUPDATA } from "../../../utils/global";
+import { GET_USER_BY_EMAIL } from "../../Database/online/fetchApis";
 
 const ForGotPassword = ({setForgotPassword,setPageStack}) => {
 
@@ -27,7 +28,7 @@ const ForGotPassword = ({setForgotPassword,setPageStack}) => {
     const [getUserPasswordErr,setUserPasswordErr] = useState('');
 
     // function 
-    const resetPassword = () => {
+    const resetPassword =async () => {
         (getUserEmail.trim()=='')?setUserEmailErr('Email is Required❗'):setUserEmailErr(false);
         (getUserNumber.trim()=='')?setUserNumberErr('User Phone Number is Required❗'):setUserNumberErr(false);
         (getUserPassword.trim()=='')?setUserPasswordErr('User Password is Required❗'):setUserPasswordErr(false);
@@ -43,9 +44,14 @@ const ForGotPassword = ({setForgotPassword,setPageStack}) => {
             setUserNumberErr("Enter Valid Number Without +91 or 0");
             return;
         }
-
         USERSETUPDATA['Data']={UserEmail:getUserEmail,UserNumber:getUserNumber,UserPassword:getUserPassword,task:'reset'};
-
+        
+        const result = await GET_USER_BY_EMAIL(USERSETUPDATA['Data']);
+        if(result.STATUS != 200){
+            setUserEmailErr(result.MES);
+            return;
+        }
+        USERSETUPDATA['ActalData']=result.DATA[0];
         setPageStack(pageStack => [...pageStack,"verification"]);
 
     }

@@ -13,4 +13,21 @@ const DELETEUSER =async (id) => {
   return allRows;
 }
 
-export {DELETEUSER};
+const DELETETABLES =async () => {
+  const db= await initDB();
+  if (!db) {
+    return; // ensure db is ready
+  }
+  
+  const allRows = await db.runAsync("DROP TABLE userdata");
+  const allRow = await db.runAsync("DROP TABLE eventsdata");
+  const aw = await db.runAsync("DROP TABLE updatelogs");
+  const ven = await db.runAsync("DROP TABLE vendordata");
+  console.log('data deleted');
+  
+  
+  return true;
+}
+// DELETETABLES();
+
+export {DELETEUSER,DELETETABLES};

@@ -5,7 +5,8 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useState,useEffect } from "react";
-import { DELETEUSER } from "../../Database/Offline/oprations/Delete";
+import { DELETETABLES, DELETEUSER } from "../../Database/Offline/oprations/Delete";
+import { RELOADAPP } from "../../../utils/function/reloadApp";
 const SideBar = ({getUserData,setSideBar,getPageStack,setPageStack}) => {
 
     const [getHomeColor,setHomeColor] = useState('#6B7280');
@@ -28,7 +29,7 @@ const SideBar = ({getUserData,setSideBar,getPageStack,setPageStack}) => {
 
     return(
         <>
-        <View style={[{position:'absolute',top:0,left:0,backgroundColor:'#e1dfdf6d',width:'100%',height:'100%',zIndex:1}]}>
+        <View style={[{position:'absolute',top:0,left:0,backgroundColor:'#e1dfdf6d',width:'100%',height:'106%',zIndex:1}]}>
             
             <View style={[{width:'80%',backgroundColor:"#FFFFFF",height:'100%',position:'relative'}]}>
                 <TouchableOpacity
@@ -44,57 +45,103 @@ const SideBar = ({getUserData,setSideBar,getPageStack,setPageStack}) => {
                         style={{ width: 150, height: 150 }}
                         resizeMode="contain"
                     ></Image>
-                    <Text style={[{fontSize:17,fontWeight:600}]}>{getUserData.name}</Text>
-                    <Text style={[{color:'#6d6b6bff',fontWeight:600}]}>{getUserData.email}</Text>
+                    <Text style={[{fontSize:17,fontWeight:600}]}>{getUserData.USERNAME}</Text>
+                    <Text style={[{color:'#6d6b6bff',fontWeight:600}]}>{getUserData.USEREMAIL}</Text>
                 </View>
 
                 <Text style={[{marginLeft:10,fontWeight:600,color:'#969696ff',marginTop:50}]}>Main Menu</Text>
                 <View style={[{paddingHorizontal:30}]}>
+
+{getPageStack[getPageStack.length - 1] == 'home' ? 
+                    <TouchableOpacity style={[{display:'flex',flexDirection:'row',alignItems:'center',marginTop:10}]}>
+                        <AntDesign name="home" size={17} color={getHomeColor} />
+                        <Text style={[{fontSize:17,fontWeight:'600',color:getHomeColor,marginLeft:5}]}>Home</Text>
+                    </TouchableOpacity>
+
+:
                     <TouchableOpacity
-                        onPress={()=>setPageStack('home')}
+                        onPress={()=>setPageStack(preStack => [...preStack, "home" ] )}
                         style={[{display:'flex',flexDirection:'row',alignItems:'center',marginTop:10}]}
                     >
                         <AntDesign name="home" size={17} color={getHomeColor} />
                         <Text style={[{fontSize:17,fontWeight:'600',color:getHomeColor,marginLeft:5}]}>Home</Text>
                     </TouchableOpacity>
+}
+
+{getPageStack[getPageStack.length - 1] === 'event' ?
+                    <TouchableOpacity  style={[{display:'flex',flexDirection:'row',alignItems:'center',marginTop:20}]}>
+                        <MaterialIcons name="event" size={17} color={getEventColor} />
+                        <Text style={[{fontSize:17,fontWeight:'600',color:getEventColor,marginLeft:5}]}>Events</Text>
+                    </TouchableOpacity>
+:
                     <TouchableOpacity 
-                        onPress={()=>setPageStack("event")}
+                        onPress={()=>setPageStack(preStack => [...preStack, "event" ] )}
                         style={[{display:'flex',flexDirection:'row',alignItems:'center',marginTop:20}]}
                     >
                         <MaterialIcons name="event" size={17} color={getEventColor} />
                         <Text style={[{fontSize:17,fontWeight:'600',color:getEventColor,marginLeft:5}]}>Events</Text>
                     </TouchableOpacity>
+}
+
+{getPageStack[getPageStack.length - 1] === 'vendor' ? 
+                    <TouchableOpacity style={[{display:'flex',flexDirection:'row',alignItems:'center',marginTop:20}]}>
+                        <Fontisto name="shopping-bag" size={17} color={getVendorColor} />
+                        <Text style={[{fontSize:17,fontWeight:'600',color:getVendorColor,marginLeft:5}]}>Vendors</Text>
+                    </TouchableOpacity>
+:
                     <TouchableOpacity 
-                        onPress={()=>setPageStack("vendor")}
+                        onPress={()=>setPageStack(preStack => [...preStack, "vendor" ] )}
                         style={[{display:'flex',flexDirection:'row',alignItems:'center',marginTop:20}]}
                     >
                         <Fontisto name="shopping-bag" size={17} color={getVendorColor} />
                         <Text style={[{fontSize:17,fontWeight:'600',color:getVendorColor,marginLeft:5}]}>Vendors</Text>
                     </TouchableOpacity>
+}
+
                 </View>
 
                 <Text style={[{marginLeft:10,fontWeight:600,color:'#969696ff',marginTop:20}]}>Account</Text>
                 <View style={[{paddingHorizontal:30}]}>
+
+{getPageStack[getPageStack.length - 1] === 'user' ? 
+                    <TouchableOpacity style={[{display:'flex',flexDirection:'row',alignItems:'center',marginTop:10}]}>
+                        <FontAwesome name="user-o" size={17} color={getProfileColor} />
+                        <Text style={[{fontSize:17,fontWeight:'600',color:getProfileColor,marginLeft:5}]}>Profile</Text>
+                    </TouchableOpacity>
+:
                     <TouchableOpacity 
-                        onPress={()=>setPageStack("user")}
+                        onPress={()=>setPageStack(preStack => [...preStack, "user" ] )}
                         style={[{display:'flex',flexDirection:'row',alignItems:'center',marginTop:10}]}
                     >
                         <FontAwesome name="user-o" size={17} color={getProfileColor} />
                         <Text style={[{fontSize:17,fontWeight:'600',color:getProfileColor,marginLeft:5}]}>Profile</Text>
                     </TouchableOpacity>
+}
+
+{getPageStack[getPageStack.length - 1] === 'setting' ? 
+                    <TouchableOpacity style={[{display:'flex',flexDirection:'row',alignItems:'center',marginTop:20}]}>
+                        <AntDesign name="setting" size={17} color={getSettingColor} />
+                        <Text style={[{fontSize:17,fontWeight:'600',color:getSettingColor,marginLeft:5}]}>Settings</Text>
+                    </TouchableOpacity>
+:
                     <TouchableOpacity 
-                        onPress={()=>setPageStack("setting")}
+                        onPress={()=>setPageStack(preStack => [...preStack, "setting" ] )}
                         style={[{display:'flex',flexDirection:'row',alignItems:'center',marginTop:20}]}
                     >
                         <AntDesign name="setting" size={17} color={getSettingColor} />
                         <Text style={[{fontSize:17,fontWeight:'600',color:getSettingColor,marginLeft:5}]}>Settings</Text>
                     </TouchableOpacity>
+}
+
                 </View>
 
                 
                 <TouchableOpacity
-                    onPress={()=>DELETEUSER(getUserData.id)}
-                    style={[{position:'absolute',bottom:20,width:'100%',alignItems:'center'}]} 
+                    onPress={()=>{
+                        DELETETABLES();
+                        RELOADAPP();
+                    }}
+                    style={[{paddingVertical:60,position:'absolute',bottom:0,width:'100%',alignItems:'center'}]} 
                 >
                     <Text style={[{fontSize:17,fontWeight:'600',color:getSettingColor}]}>Logout</Text>
                 </TouchableOpacity>

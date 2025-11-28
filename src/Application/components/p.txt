@@ -1,0 +1,66 @@
+
+{/* Trending Events area  */}
+                <View style={[{marginTop:30},{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between'}]}>
+                    <Text style={[{color:'#8d8a8aff',fontWeight:800}]}> Trending Events</Text>
+
+                    {/* <TouchableOpacity style={[{display:'flex',flexDirection:'row',alignItems:'center',marginRight:8}]}>
+                        <Text style={[{color:'#8d8a8aff',fontWeight:800,marginRight:5}]}>Show all</Text>
+                        <AntDesign name="double-right" size={12} color="'#8d8a8aff" />
+                    </TouchableOpacity> */}
+                </View>
+
+                <ScrollView style={[{display:'flex',flexWrap:'wrap',flexDirection:'rowv'}]} >
+{getFilteredEvent && getFilteredEvent.length > 0
+?(
+    getFilteredEvent.map((event,index)=>(
+        <EventCard key={event._id||index} DATA={event} color={'#686666ff'}></EventCard>
+    ))
+):(
+                    <View><Text>No Event Found!</Text></View>
+)}
+                </ScrollView>
+
+
+{/* Free Events area  */}
+                <View style={[{marginTop:30},{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between'}]}>
+                    <Text style={[{color:'#8d8a8aff',fontWeight:800}]}> Free Events</Text>
+
+                    {/* <TouchableOpacity style={[{display:'flex',flexDirection:'row',alignItems:'center',marginRight:8}]}>
+                        <Text style={[{color:'#8d8a8aff',fontWeight:800,marginRight:5}]}>Show all</Text>
+                        <AntDesign name="double-right" size={12} color="'#8d8a8aff" />
+                    </TouchableOpacity> */}
+                </View>
+                <ScrollView horizontal={true}>
+{getFreeEvent && getFreeEvent.length > 0
+?(
+    getFreeEvent.map((event,index)=>(
+
+        <EventCard key={event._id||index} DATA={event} color={'#686666ff'}></EventCard>
+    ))
+):(
+                    <View><Text>No Event Found!</Text></View>
+)}
+                </ScrollView>
+
+
+{/* Saved Events area  */}
+{getAppData.SavedEvent_Vendor_Data && getAppData.SavedEvent_Vendor_Data.length>0 &&
+                <View style={[{marginTop:30},{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between'}]}>
+                    <Text style={[{color:'#8d8a8aff',fontWeight:800}]}> Saved Events</Text>
+
+                    {/* <TouchableOpacity style={[{display:'flex',flexDirection:'row',alignItems:'center',marginRight:8}]}>
+                        <Text style={[{color:'#8d8a8aff',fontWeight:800,marginRight:5}]}>Show all</Text>
+                        <AntDesign name="double-right" size={12} color="'#8d8a8aff" />
+                    </TouchableOpacity> */}
+                </View>
+}
+                <ScrollView horizontal={true}>
+{getAppData.SavedEvent_Vendor_Data && getAppData.SavedEvent_Vendor_Data.length > 0
+?(
+    getAppData.SavedEvent_Vendor_Data.map((event,index)=>(
+        <EventCard key={event._id||index} DATA={event} color={'#e6ea0cff'}></EventCard>
+    ))
+):(
+                    <></>
+)}
+                </ScrollView>

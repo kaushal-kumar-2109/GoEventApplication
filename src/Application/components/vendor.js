@@ -1,79 +1,112 @@
-import { View,Text,StyleSheet, ScrollView,TouchableOpacity } from 'react-native';
+import { View,Text,StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AntDesign from '@expo/vector-icons/AntDesign';
-
+import { useEffect, useState } from 'react';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 // importing user-build components
 import { NavBar } from '../comman_component/navBar';
 import { FootBar } from '../comman_component/footer';
 import { SideBar } from '../comman_component/sideBar';
-import { useState } from 'react';
 import { ActionCard } from '../elements/ActionCard';
 import { LinearColor } from '../../../public/styles/global';
-import {VendorCard} from '../elements/VendorCard';
+import { EventCard } from '../elements/EventCard';
+import { EventFilter } from '../comman_component/eventfilter';
+import { VendorCard } from '../elements/VendorCard';
 
 const VendorPage = ({getAppData,setAppData,setPageStack,getPageStack}) => {
-    const [getSideBar,setSideBar] = useState(false);
+ 
+        const [getSideBar,setSideBar]=useState(false);
+    const [getSearchValue,setSearchValue] = useState('');
+    const [getFilteredEvent,setFilteredEvents] = useState([]);
+    const [getFreeEvent,setFreeEvent] = useState([]);
+    const [getFilter,setFilter] = useState('');
+    // console.log(getAppData.SavedEvent_Vendor_Data);
+
+    const getSerachResult = () => {
+        if (!getSearchValue || getSearchValue.trim() === "") {
+            setFilteredEvents(getAppData.VendorData);
+        } else {
+            const filtered = getAppData.VendorData.filter(vendor =>
+                vendor.VENDORNAME.toLowerCase().includes(getSearchValue.toLowerCase())
+            );
+            setFilteredEvents(filtered);
+        }
+    }
+    const setEvents = async () =>{
+        const FreeEvent = getAppData.VendorData.filter(vendor =>
+            event.EVENTAMOUNT === '0'
+        );
+        setFreeEvent(FreeEvent);
+    }
+    // getSerachResult();
+    useEffect(()=>{
+        getSerachResult();
+        // setEvents();
+    },[])
+
     return(
         <>
         <SafeAreaView style={[styles.container]}>
-            <NavBar setPageStack={setPageStack} getAppData={getAppData} title={'Vendors'} style={[{position:'fixed'}]} setSideBar={setSideBar}></NavBar>
+            <NavBar setPageStack={setPageStack} getAppData={getAppData} getResult={getSerachResult} setSearchValue={setSearchValue} setSideBar={setSideBar} title={'Vendors'} style={[{position:'fixed'}]}></NavBar>
 {getSideBar && 
             <SideBar setSideBar={setSideBar} getUserData={getAppData.UserData} getPageStack={getPageStack} setPageStack={setPageStack}></SideBar>
 }
-            <ScrollView>
+            <View>
+                {/* <EventFilter></EventFilter> */}
+                <ScrollView>
 
-{/* Top Action card  for user creation. */}
-                <View style={[{paddingRight:8,marginTop:10}]}>
-                    <ScrollView horizontal={true} style={[{width:'100%'}]}>
+    {/* filter code  */}
 
-                        <TouchableOpacity>
-                            <ActionCard title={'Create Vendor'} dis={'Create your own Vendor.'} color={LinearColor.Sec_PriBtn_Sec}></ActionCard>
+    {/* filter code end */}
+    {/* Top Action card  for user creation. */}
+                    {/* <View style={[{paddingRight:8,marginTop:10}]}>
+                        <ScrollView horizontal={true} style={[{width:'100%'}]}>
+
+                            <TouchableOpacity>
+                                <ActionCard title={'Create Event'} dis={'Create your own evnets.'} color={LinearColor.Sec_PriBtn_Sec}></ActionCard>
+                            </TouchableOpacity>
+                            <TouchableOpacity>
+                                <ActionCard title={'Show Event'} dis={'Check created events.'} color={LinearColor.PriBtn_Sec_PriBtn}></ActionCard>
+                            </TouchableOpacity>
+
+                        </ScrollView>
+                    </View> */}
+
+                    <View style={[{width:'100%',paddingHorizontal:20,paddingVertical:30,flexDirection:'row',alignItems:'center'}]}>
+
+                        <TouchableOpacity style={[{flexDirection:'row',alignItems:'center'}]}>
+                            <MaterialCommunityIcons name="filter-plus-outline" size={24} color="#686666ff" />
+                            <Text style={[{marginHorizontal:10,width:60,fontSize:20,color:'#686666ff'}]}>filter /</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity>
-                            <ActionCard title={'Show Vendors'} dis={'Check created vendors.'} color={LinearColor.PriBtn_Sec_PriBtn}></ActionCard>
-                        </TouchableOpacity>
-                        
+                        <View style={[{width:'50%'}]}>
+                            <Text style={[{width:'auto',color:'#686666ab'}]}
+                            numberOfLines={1}
+                            ellipsizeMode='true'
+                            > 
+                            {(getFilter.length<=0)?'No filter':getFilter}
+                            </Text>
+                        </View>
+
+                    </View>
+                    <ScrollView style={[{width:'100%', marginTop:30}]}>
+                        <View style={[{width:'100%',flexDirection:'row',flexWrap:'wrap',justifyContent:'space-evenly'}]}>
+
+    {getFilteredEvent && getFilteredEvent.length > 0
+    ?(
+        getFilteredEvent.map((vendor,index)=>(
+                        <VendorCard key={vendor._id||index} DATA={vendor} color={'#686666ff'}></VendorCard>
+        ))
+    ):(
+                        <View><Text>No Event Found!</Text></View>
+    )}
+
+                        </View>
                     </ScrollView>
-                </View>
 
-{/* Trending Events area  */}
-                <View style={[{marginTop:30},{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between'}]}>
-                    <Text style={[{color:'#8d8a8aff',fontWeight:800}]}> Trending Events</Text>
+                </ScrollView>
+            </View>
 
-                    <TouchableOpacity style={[{display:'flex',flexDirection:'row',alignItems:'center',marginRight:8}]}>
-                        <Text style={[{color:'#8d8a8aff',fontWeight:800,marginRight:5}]}>Show all</Text>
-                        <AntDesign name="double-right" size={12} color="'#8d8a8aff" />
-                    </TouchableOpacity>
-                </View>
-                <View style={[{alignItems:'center'}]}>
-                    <VendorCard></VendorCard>
-                    <VendorCard></VendorCard>
-                    <VendorCard></VendorCard>
-                    <VendorCard></VendorCard>
-                    <VendorCard></VendorCard>
-                </View>
-
-                <View style={[{marginVertical:30,display:'flex',flexDirection:'row',justifyContent:'space-between',paddingHorizontal:8}]}>
-                    
-                    <TouchableOpacity>
-                        <View style={[{display:'flex',flexDirection:'row',alignItems:'center'}]}>
-                            <AntDesign name="double-left" size={12} color="#8d8a8aff" />
-                            <Text style={[{color:'#8d8a8aff',fontWeight:800,marginLeft:5}]}>Privious</Text>
-                        </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity>
-                        <View style={[{display:'flex',flexDirection:'row',alignItems:'center'}]}>
-                            <Text style={[{color:'#8d8a8aff',fontWeight:800,marginRight:5}]}>Next</Text>
-                            <AntDesign name="double-right" size={12} color="#8d8a8aff" />
-                        </View>
-                    </TouchableOpacity>
-                    
-                </View>
-
-            </ScrollView>
-            <FootBar getPageStack={getPageStack} setPageStack={setPageStack} style={[{position:'absolute',bottum:0}]}></FootBar>
+        {/* <FootBar style={[{position:'absolute',bottum:0}]} getPageStack={getPageStack} setPageStack={setPageStack}></FootBar> */}
         </SafeAreaView>
         </>
     )
@@ -86,5 +119,16 @@ const styles = StyleSheet.create({
         position:'relative',
         width:'100%',
         height:'100%',
+    },
+    filter:{
+        position:'absolute',
+        backgroundColor:'#ffffff',
+        height:100,
+        width:'80%',
+        top:0,
+        right:0,
+        zIndex:15,
+        borderWidth:2,
+        borderColor:'#c2c0c011'
     }
 });

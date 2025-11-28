@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { BackHandler } from "react-native";
 
 import {HomePage} from "./components/home";
 import {VendorPage} from "./components/vendor";
@@ -12,9 +13,34 @@ import { SavedPage } from "./components/saved";
 
 export default function Application({ getAppData,setAppData }) {
 
-  const [getPageStack,setPageStack] = useState("home");
+  const [getPageStack,setPageStack] = useState(["home"]);
   const [getEvents,setEvents] = useState(false);
   const [getDataSet,setDataSet] = useState({});
+
+  console.log("page Stack ==>  ",getPageStack);
+
+  useEffect(() => {
+    const backAction = () => {
+      setPriviousPageStack();
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+    return () => backHandler.remove();
+  }, []);
+
+  const setPriviousPageStack = () => {
+    setPageStack(prevStack => {
+      if (prevStack.length > 1) {
+        return prevStack.slice(0, -1); // Go back one page
+      } else {
+        BackHandler.exitApp(); // Exit app if on home screen
+        return prevStack;
+      }
+    });
+  }
 
   // const GetDataSets = async () => {
   //   const rows = await GETEVENTS();
@@ -29,22 +55,22 @@ export default function Application({ getAppData,setAppData }) {
 
   return (
     <>
-      {getPageStack=="user" &&
+      {getPageStack[getPageStack.length - 1] == "user" &&
         <UserPage getAppData={getAppData} setAppData={setAppData} setPageStack={setPageStack} getPageStack={getPageStack}></UserPage>
       }
-      {getPageStack=="event" &&
+      {getPageStack[getPageStack.length - 1] == "event" &&
         <EventPage getAppData={getAppData} setAppData={setAppData} setPageStack={setPageStack} getPageStack={getPageStack}></EventPage>
       }
-      {getPageStack=="home" &&
+      {getPageStack[getPageStack.length - 1] == "home" &&
         <HomePage getAppData={getAppData} setAppData={setAppData} setPageStack={setPageStack} getPageStack={getPageStack}></HomePage>
       }
-      {getPageStack=="vendor" &&
+      {getPageStack[getPageStack.length - 1] == "vendor" &&
         <VendorPage getAppData={getAppData} setAppData={setAppData} setPageStack={setPageStack} getPageStack={getPageStack}></VendorPage>
       }
-      {getPageStack=="setting" &&
+      {getPageStack[getPageStack.length - 1] == "setting" &&
         <SettingPage getAppData={getAppData} setAppData={setAppData} setPageStack={setPageStack} getPageStack={getPageStack}></SettingPage>
       }
-      {getPageStack=='saved'&&
+      {getPageStack[getPageStack.length - 1] == 'saved'&&
         <SavedPage getAppData={getAppData} setAppData={setAppData} setPageStack={setPageStack} getPageStack={getPageStack}></SavedPage>
       }
     </>

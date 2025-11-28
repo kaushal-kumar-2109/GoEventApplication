@@ -1,9 +1,9 @@
-import { APIs } from "../../src/Database/online/routers";
+import { APIs } from "./routers";
 
-const sendEmail = async (data) => {
+const GET_USER_BY_EMAIL = async (data) => {
   let response
   try{
-    response = await fetch(APIs.sendOtpByEmail, {      //"https://goeventserver.onrender.com/goevent/user/account/login"
+    response = await fetch(APIs.getUserByEmail, {      //"https://goeventserver.onrender.com/goevent/user/account/login"
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -16,12 +16,12 @@ const sendEmail = async (data) => {
     return ({err:error,mes:'There is Server Error',code:500,status:false});
   }
   const res = await response.json();
-  if(res.STATUS==200){
-    return(res.OTP);
+
+  if(res.status==true){
+    return(res.res.data);
   }else{
-    
-    return false;
+    return res;
   }
 }
 
-export {sendEmail};
+export { GET_USER_BY_EMAIL };

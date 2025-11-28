@@ -8,7 +8,7 @@ import { COLORS } from "../../../public/styles/global";
 import { use } from "react";
 import { AddToOffline } from "../../../OfflineDataHandle/bookMark";
 
-const EventCard = ({DATA,color}) => {
+const HomeCard = ({DATA,color}) => {
 
     return(
         <TouchableOpacity style={[Style.Card]}>
@@ -21,27 +21,8 @@ const EventCard = ({DATA,color}) => {
             <View style={[{top:-50}]}>
                 <Text style={[{fontWeight:800,fontSize:20,color:'#686666ff'}]} numberOfLines={1} ellipsizeMode="tail">{DATA.EVENTNAME}</Text>
                 <View style={[Style.DetailDiv]}>
-                    <EvilIcons name="calendar" size={24} color="#686666ff" />
-                    <Text style={[Style.Detail]} numberOfLines={1} ellipsizeMode="tail">{DATA.EVENTDATE}</Text>
-                </View>
-                <View style={[Style.DetailDiv,{marginLeft:5}]}>
-                    <Feather name="clock" size={18} color="#686666ff"/>
-                    <Text style={[Style.Detail]} numberOfLines={1} ellipsizeMode="tail">{DATA.EVENTTIME}</Text>
-                </View>
-                <View style={[Style.DetailDiv]}>
                     <EvilIcons name="location" size={24} color="#686666ff" />
                     <Text style={[Style.Detail]} numberOfLines={1} ellipsizeMode="tail">{DATA.EVENTLOCATION}</Text>
-                </View>
-                <View style={[{flexDirection:'row',justifyContent:'space-between',marginTop:20,alignItems:'center'}]}>
-                    <TouchableOpacity onPress={()=>saveToBookMark(DATA.id,DATA.UserId)}>
-                        <FontAwesome5 name="bookmark" size={20} color={color} style={[{marginLeft:10}]} />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[{flexDirection:'row',alignItems:'center',paddingHorizontal:10,paddingVertical:5,borderRadius:10,backgroundColor:COLORS.primary,borderColor:'#9a9898ff',borderWidth:1}]}>
-                        <FontAwesome5 name="rupee-sign" size={12} color="#ffffff"/>
-                        <Text style={[{color:'#ffffff',marginLeft:5}]}>
-                            {DATA.EVENTAMOUNT === '0'?"Free":DATA.EVENTAMOUNT}
-                        </Text>
-                    </TouchableOpacity>
                 </View>
             </View>
 
@@ -49,16 +30,16 @@ const EventCard = ({DATA,color}) => {
     )
 }
 
-export {EventCard};
+export {HomeCard};
 
 const Style= StyleSheet.create({
     Card:{
-        width:280,
-        height:250,
+        width:250,
+        height:160,
         borderWidth:3,
         borderColor:'#cfc8c84d',
         borderRadius:10,
-        marginVertical:60,
+        marginVertical:40,
         padding:10,
         marginHorizontal:10
     },

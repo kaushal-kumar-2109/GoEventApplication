@@ -33,33 +33,61 @@ const FootBar = ({setPageStack,getPageStack}) => {
         <View style={[styles.container]}>
             <View style={[{display:'flex', flexDirection:'row', alignItems:'center',justifyContent:'space-evenly',width:'100%'}]}>
 
+{getPageStack[getPageStack.length - 1]=='home' ? 
+                <TouchableOpacity style={[styles.block]} >
+                    <Ionicons name="home-outline" size={20} color={getHomeColor} />
+                    <Text style={[FONTS.small,{color:getHomeColor}]}>Home</Text>
+                </TouchableOpacity>
+:
                 <TouchableOpacity style={[styles.block]} 
-                onPress={()=>setPageStack('home')}
+                onPress={()=>setPageStack(preStack => [...preStack,'home'] )}
                 >
                     <Ionicons name="home-outline" size={20} color={getHomeColor} />
                     <Text style={[FONTS.small,{color:getHomeColor}]}>Home</Text>
                 </TouchableOpacity>
+}
 
+{getPageStack[getPageStack.length - 1]=='event' ? 
+                <TouchableOpacity style={[styles.block]} >
+                    <MaterialIcons name="event" size={20} color={getEventColor} />
+                    <Text style={[FONTS.small,{color:getEventColor}]}>Events</Text>
+                </TouchableOpacity>
+:
                 <TouchableOpacity style={[styles.block]} 
-                onPress={()=>setPageStack('event')}
+                onPress={()=>setPageStack(preStack => [...preStack, "event" ] )}
                 >
                     <MaterialIcons name="event" size={20} color={getEventColor} />
                     <Text style={[FONTS.small,{color:getEventColor}]}>Events</Text>
                 </TouchableOpacity>
+}
 
+{getPageStack[getPageStack.length - 1]=='vendor' ? 
+                <TouchableOpacity style={[styles.block]}>
+                    <Fontisto name="shopping-store" size={20} color={getVendorColor} />
+                    <Text style={[FONTS.small,{color:getVendorColor}]}>Vendors</Text>
+                </TouchableOpacity>
+:
                 <TouchableOpacity style={[styles.block]} 
-                onPress={()=>setPageStack('vendor')}
+                onPress={()=>setPageStack(preStack => [...preStack, "vendor" ] )}
                 >
                     <Fontisto name="shopping-store" size={20} color={getVendorColor} />
                     <Text style={[FONTS.small,{color:getVendorColor}]}>Vendors</Text>
                 </TouchableOpacity>
+}
 
+{getPageStack[getPageStack.length - 1] == "user" ?
+                <TouchableOpacity style={[styles.block]} >
+                    <FontAwesome name="user-o" size={20} color={getProfileColor} />
+                    <Text style={[FONTS.small,{color:getProfileColor}]}>Profile</Text>
+                </TouchableOpacity>
+:
                 <TouchableOpacity style={[styles.block]} 
-                onPress={()=>setPageStack("user")}
+                    onPress={()=>setPageStack(preStack => [...preStack, "user" ] )}
                 >
                     <FontAwesome name="user-o" size={20} color={getProfileColor} />
                     <Text style={[FONTS.small,{color:getProfileColor}]}>Profile</Text>
                 </TouchableOpacity>
+}
 
             </View>
         </View>
@@ -71,7 +99,7 @@ export {FootBar};
 
 const styles = StyleSheet.create({
     container:{
-        paddingVertical:20,
+        paddingVertical:10,
         paddingHorizontal:15,
         width:'100%',
         height:"auto",
@@ -81,7 +109,6 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         borderColor:'#cac4c42d',
         borderTopWidth:3,
-        elevation:1
     },
     block:{
         display:'flex',

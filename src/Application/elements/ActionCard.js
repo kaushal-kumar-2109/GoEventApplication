@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     createCard:{
         borderWidth:0.5,
         borderColor:'#8e8d8dff',
-        height:100,
+        height:150,
         width:200,
         borderRadius:6,
         padding:5,

@@ -23,14 +23,14 @@ const UserPage = ({getAppData,setAppData,setPageStack,getPageStack}) => {
 
 
             <ScrollView>
-                <View style={[{justifyContent:'center',alignItems:'center',paddingHorizontal:10,paddingVertical:25,borderBottomWidth:3,borderColor:'#d4d1d13e'}]}>
+                <View style={[{justifyContent:'center',alignItems:'center',paddingHorizontal:10,paddingVertical:25,borderBottomWidth:3,borderColor:'#d4d1d13e',marginVertical:10}]}>
                     <Image 
                         source={require("../../../assets/user.png")}
                         style={{ width: 150, height: 150 }}
                         resizeMode="contain"
                     ></Image>
-                    <Text style={[{fontWeight:800,fontSize:20}]}>{getAppData.UserData.name}</Text>
-                    <Text style={[{fontWeight:600,color:'#8a8888ff'}]}>{getAppData.UserData.email}</Text>
+                    <Text style={[{fontWeight:800,fontSize:20}]}>{getAppData.UserData.USERNAME}</Text>
+                    <Text style={[{fontWeight:600,color:'#8a8888ff'}]}>{getAppData.UserData.USEREMAIL}</Text>
                 </View>
 
                 <ScrollView horizontal={true} style={[{width:'100%',paddingVertical:10}]}>
@@ -44,9 +44,9 @@ const UserPage = ({getAppData,setAppData,setPageStack,getPageStack}) => {
                     <Text style={[{fontWeight:800,fontSize:20}]}>Update Profile</Text>
                     <View style={[{borderWidth:1,borderRadius:8,width:'90%',borderColor:'#d4d1d18c',marginTop:10}]}>
                         <Text style={[styles.lable]}>Name:</Text>
-                        <TextInput style={[styles.input]} placeholder={getAppData.UserData.name}></TextInput>
+                        <TextInput style={[styles.input]} placeholder={getAppData.UserData.USERNAME}></TextInput>
                         <Text style={[styles.lable]}>Phone Number:</Text>
-                        <TextInput style={[styles.input]} placeholder={getAppData.UserData.phone}></TextInput>
+                        <TextInput style={[styles.input]} placeholder={getAppData.UserData.USERNUMBER}></TextInput>
                         <Text style={[styles.lable]}>Password:</Text>
                         <TextInput style={[styles.input]} placeholder='********'></TextInput>
 

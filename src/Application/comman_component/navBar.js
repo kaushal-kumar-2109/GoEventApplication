@@ -72,7 +72,7 @@ const NavBar = ({setPageStack,getAppData,title,setSideBar,getSearchValue,setSear
                     <Text
                         style={[{position:'absolute',top:-8,right:-6,borderRadius:50,backgroundColor:'#f8e42bff',height:15,width:15,textAlign:"center",fontSize:10}]}
                     >
-                        {getAppData.SavedEvent_Vendor_list.length}
+                        0
                     </Text>
                 </TouchableOpacity>
 }

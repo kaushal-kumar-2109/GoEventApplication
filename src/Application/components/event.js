@@ -1,6 +1,7 @@
 import { View,Text,StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useState } from 'react';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 // importing user-build components
 import { NavBar } from '../comman_component/navBar';
@@ -9,6 +10,7 @@ import { SideBar } from '../comman_component/sideBar';
 import { ActionCard } from '../elements/ActionCard';
 import { LinearColor } from '../../../public/styles/global';
 import { EventCard } from '../elements/EventCard';
+import { EventFilter } from '../comman_component/eventfilter';
 
 const EventPage = ({getAppData,setAppData,setPageStack,getPageStack}) => {
 
@@ -16,6 +18,7 @@ const EventPage = ({getAppData,setAppData,setPageStack,getPageStack}) => {
     const [getSearchValue,setSearchValue] = useState('');
     const [getFilteredEvent,setFilteredEvents] = useState([]);
     const [getFreeEvent,setFreeEvent] = useState([]);
+    const [getFilter,setFilter] = useState('');
     // console.log(getAppData.SavedEvent_Vendor_Data);
 
     const getSerachResult = () => {
@@ -47,93 +50,62 @@ const EventPage = ({getAppData,setAppData,setPageStack,getPageStack}) => {
 {getSideBar && 
             <SideBar setSideBar={setSideBar} getUserData={getAppData.UserData} getPageStack={getPageStack} setPageStack={setPageStack}></SideBar>
 }
-            <ScrollView>
+            <View>
+                {/* <EventFilter></EventFilter> */}
+                <ScrollView>
 
-{/* Top Action card  for user creation. */}
-                <View style={[{paddingRight:8,marginTop:10}]}>
-                    <ScrollView horizontal={true} style={[{width:'100%'}]}>
+    {/* filter code  */}
 
-                        <TouchableOpacity>
-                            <ActionCard title={'Create Event'} dis={'Create your own evnets.'} color={LinearColor.Sec_PriBtn_Sec}></ActionCard>
+    {/* filter code end */}
+    {/* Top Action card  for user creation. */}
+                    {/* <View style={[{paddingRight:8,marginTop:10}]}>
+                        <ScrollView horizontal={true} style={[{width:'100%'}]}>
+
+                            <TouchableOpacity>
+                                <ActionCard title={'Create Event'} dis={'Create your own evnets.'} color={LinearColor.Sec_PriBtn_Sec}></ActionCard>
+                            </TouchableOpacity>
+                            <TouchableOpacity>
+                                <ActionCard title={'Show Event'} dis={'Check created events.'} color={LinearColor.PriBtn_Sec_PriBtn}></ActionCard>
+                            </TouchableOpacity>
+
+                        </ScrollView>
+                    </View> */}
+
+                    <View style={[{width:'100%',paddingHorizontal:20,paddingVertical:30,flexDirection:'row',alignItems:'center'}]}>
+
+                        <TouchableOpacity style={[{flexDirection:'row',alignItems:'center'}]}>
+                            <MaterialCommunityIcons name="filter-plus-outline" size={24} color="#686666ff" />
+                            <Text style={[{marginHorizontal:10,width:60,fontSize:20,color:'#686666ff'}]}>filter /</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity>
-                            <ActionCard title={'Show Event'} dis={'Check created events.'} color={LinearColor.PriBtn_Sec_PriBtn}></ActionCard>
-                        </TouchableOpacity>
-                        
+                        <View style={[{width:'50%'}]}>
+                            <Text style={[{width:'auto',color:'#686666ab'}]}
+                            numberOfLines={1}
+                            ellipsizeMode='true'
+                            > 
+                            {(getFilter.length<=0)?'No filter':getFilter}
+                            </Text>
+                        </View>
+
+                    </View>
+                    <ScrollView style={[{width:'100%', marginTop:30}]}>
+                        <View style={[{width:'100%',flexDirection:'row',flexWrap:'wrap',justifyContent:'space-evenly'}]}>
+
+    {getFilteredEvent && getFilteredEvent.length > 0
+    ?(
+        getFilteredEvent.map((event,index)=>(
+                        <EventCard key={event._id||index} DATA={event} color={'#686666ff'}></EventCard>
+        ))
+    ):(
+                        <View><Text>No Event Found!</Text></View>
+    )}
+
+                        </View>
                     </ScrollView>
-                </View>
 
-
-
-{/* Trending Events area  */}
-                <View style={[{marginTop:30},{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between'}]}>
-                    <Text style={[{color:'#8d8a8aff',fontWeight:800}]}> Trending Events</Text>
-
-                    {/* <TouchableOpacity style={[{display:'flex',flexDirection:'row',alignItems:'center',marginRight:8}]}>
-                        <Text style={[{color:'#8d8a8aff',fontWeight:800,marginRight:5}]}>Show all</Text>
-                        <AntDesign name="double-right" size={12} color="'#8d8a8aff" />
-                    </TouchableOpacity> */}
-                </View>
-                <ScrollView horizontal={true}>
-{getFilteredEvent && getFilteredEvent.length > 0
-?(
-    getFilteredEvent.map((event,index)=>(
-        <EventCard key={event._id||index} DATA={event} color={'#686666ff'}></EventCard>
-    ))
-):(
-                    <View><Text>No Event Found!</Text></View>
-)}
                 </ScrollView>
+            </View>
 
-
-{/* Free Events area  */}
-                <View style={[{marginTop:30},{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between'}]}>
-                    <Text style={[{color:'#8d8a8aff',fontWeight:800}]}> Free Events</Text>
-
-                    {/* <TouchableOpacity style={[{display:'flex',flexDirection:'row',alignItems:'center',marginRight:8}]}>
-                        <Text style={[{color:'#8d8a8aff',fontWeight:800,marginRight:5}]}>Show all</Text>
-                        <AntDesign name="double-right" size={12} color="'#8d8a8aff" />
-                    </TouchableOpacity> */}
-                </View>
-                <ScrollView horizontal={true}>
-{getFreeEvent && getFreeEvent.length > 0
-?(
-    getFreeEvent.map((event,index)=>(
-
-        <EventCard key={event._id||index} DATA={event} color={'#686666ff'}></EventCard>
-    ))
-):(
-                    <View><Text>No Event Found!</Text></View>
-)}
-                </ScrollView>
-
-
-{/* Saved Events area  */}
-{getAppData.SavedEvent_Vendor_Data && getAppData.SavedEvent_Vendor_Data.length>0 &&
-                <View style={[{marginTop:30},{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between'}]}>
-                    <Text style={[{color:'#8d8a8aff',fontWeight:800}]}> Saved Events</Text>
-
-                    {/* <TouchableOpacity style={[{display:'flex',flexDirection:'row',alignItems:'center',marginRight:8}]}>
-                        <Text style={[{color:'#8d8a8aff',fontWeight:800,marginRight:5}]}>Show all</Text>
-                        <AntDesign name="double-right" size={12} color="'#8d8a8aff" />
-                    </TouchableOpacity> */}
-                </View>
-}
-                <ScrollView horizontal={true}>
-{getAppData.SavedEvent_Vendor_Data && getAppData.SavedEvent_Vendor_Data.length > 0
-?(
-    getAppData.SavedEvent_Vendor_Data.map((event,index)=>(
-        <EventCard key={event._id||index} DATA={event} color={'#e6ea0cff'}></EventCard>
-    ))
-):(
-                    <></>
-)}
-                </ScrollView>
-
-
-
-            </ScrollView>
-            <FootBar style={[{position:'absolute',bottum:0}]} getPageStack={getPageStack} setPageStack={setPageStack}></FootBar>
+        {/* <FootBar style={[{position:'absolute',bottum:0}]} getPageStack={getPageStack} setPageStack={setPageStack}></FootBar> */}
         </SafeAreaView>
         </>
     )
@@ -145,5 +117,16 @@ const styles = StyleSheet.create({
         position:'relative',
         width:'100%',
         height:'100%',
+    },
+    filter:{
+        position:'absolute',
+        backgroundColor:'#ffffff',
+        height:100,
+        width:'80%',
+        top:0,
+        right:0,
+        zIndex:15,
+        borderWidth:2,
+        borderColor:'#c2c0c011'
     }
 });

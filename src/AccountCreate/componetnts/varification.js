@@ -4,13 +4,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { COLORS, FONTS } from "../../../public/styles/global";
-import { USERDATA, USERSETUPDATA } from "../../../utils/global";
+import { USERSETUPDATA } from "../../../utils/global";
 import { checkInternet } from "../../../utils/function/checkNetwork";
 import { sendEmail } from "../../../utils/apis/sendMail";
-import { getUserData } from "../../../utils/apis/fetchApis";
-import { updateData, uploadData } from "../../../utils/apis/handleDataChnage";
-import { CREATEUSER } from "../../Database/Offline/oprations/Create";
 import { RELOADAPP } from "../../../utils/function/reloadApp";
+import { CREATE_USER } from "../../Database/Offline/oprations/Create";
 
 const Verification = ({ setPageStack,setMainPageStack}) => {
   const [focusedIndex, setFocusedIndex] = useState(null); // track which input is active
@@ -20,6 +18,7 @@ const Verification = ({ setPageStack,setMainPageStack}) => {
   const [timer, setTimer] = useState(120); // 2 minutes in seconds
   const [isResendDisabled, setIsResendDisabled] = useState(true);
   const [getDataToSet,setDataToSet] = useState({});
+  const [getError,setError] = useState(false);
 
   // refs for OTP inputs
   const inputRefs = useRef([]);
@@ -85,32 +84,37 @@ const Verification = ({ setPageStack,setMainPageStack}) => {
     if(parseInt(getSendCode) == parseInt(inputCode)){
       console.log('valid otp');
 
+  
       if(USERSETUPDATA.Data.task==='login'){
-        const oflineRes = await CREATEUSER(getDataToSet);
-        if(oflineRes.status==200 || oflineRes.status){
+        const user = await CREATE_USER(USERSETUPDATA);
+        if(user.STATUS==200 || user.STATUS){
           console.log('data save!');
           await RELOADAPP();
+        }else{
+          setError(user.MES);
         }
       }
 
       if(USERSETUPDATA.Data.task==='signup'){
-        const res = await uploadData(USERSETUPDATA);
-        const oflineRes = await CREATEUSER(res);
-        if(oflineRes.status==200 || oflineRes.status){
-          console.log('data save!');
+        console.log("signup");
+        const user = await CREATE_USER(USERSETUPDATA);
+        if(user.STATUS==200){
+          console.log('data save! ✅');
           await RELOADAPP();
         }
+        else{
+          setError(user.MES);
+        }
       }
+
       if(USERSETUPDATA.Data.task==='reset'){
-        const res = await updateData(USERSETUPDATA);
-        if(res.status==true||res.status){
-          const oflineRes = await CREATEUSER(res.res);
-          if(oflineRes.status==200 || oflineRes.status){
-            console.log('data save!');
-            await RELOADAPP(); 
-          }
+        const user = await CREATE_USER(USERSETUPDATA);
+
+        if(user.STATUS==200){
+          console.log('data save!');
+          await RELOADAPP(); 
         }else{
-          alert('Something is Wrong Password Not Reset');
+          setError(user.MES);
           return;
         }
       }
@@ -124,34 +128,14 @@ const Verification = ({ setPageStack,setMainPageStack}) => {
 
   const sendMail = async () => {
     if(await checkInternet()==true){
-
-      const response = await getUserData(USERSETUPDATA);
-      if(response.status==false){
-        if(USERSETUPDATA.Data.task==='login'||USERSETUPDATA.Data.task==='reset'){
-          if(USERSETUPDATA.Data.task==='login'){
-            alert(`${response.res.mes}❗`);
-          }else{
-            alert('There Is No User With This Email or Number ❗');
-          }
-          setPageStack(pageStack => pageStack.slice(0,-1));
-          return;
-        }
-      }
-      else{
-        if(USERSETUPDATA.Data.task==='signup'){
-          alert(`The Account Already Created With This Email❗`);
-          setPageStack(pageStack => pageStack.slice(0,-1));
-          return;
-        }
-      }
-      if(USERSETUPDATA.Data.task==='login'){
-        setDataToSet(response);
-      }
       console.log('sending Email');
       const emailRes = await sendEmail(USERSETUPDATA);
-      if(emailRes.status==true){
+      if(emailRes){
         alert('OTP send !');
-        setSendCode(emailRes.data.OTP);
+        setSendCode(emailRes);
+        return;
+      }else{
+        setError("There is an Error.");
       }
 
     }else{
@@ -180,11 +164,14 @@ const Verification = ({ setPageStack,setMainPageStack}) => {
         {/* Title */}
         <View style={{ marginTop: 40, width: '100%', alignItems: 'center' }}>
           <Text style={{ color: COLORS.primaryBtn, fontWeight: '700', fontSize: 20 }}>Enter Verification Code</Text>
-          <Text style={{ textAlign: 'center', fontSize: 14, marginTop: 5 }}>
-            Please type the verification code sent to{"\n"}
+          <Text style={{ textAlign: 'center', fontSize: 14, marginTop: 5,zIndex:10 }}>
+            Please type the verification code sent{"\n"} to{"\n"}
             <Text style={{ fontWeight: '700', fontSize: 16 }}>{USERSETUPDATA.Data.UserEmail}</Text>
           </Text>
+          <Text></Text>
         </View>
+
+        {(getError)?<Text style={{ fontWeight: '700', fontSize: 16, color:"#fa0202ff",marginTop:10,textAlign:'center' }}>{getError}</Text>:<></>}
 
         {/* OTP Inputs */}
         <View style={styles.otpContainer}>

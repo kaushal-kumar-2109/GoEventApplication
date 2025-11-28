@@ -1,9 +1,9 @@
-import { APIs } from "./routers";
+import { APIs } from "../../src/Database/online/routers";
 
-const getUserData = async (data) => {
+const GET_DATA = async (data) => {
   let response
   try{
-    response = await fetch(APIs.getUserByEmail_Password, {      //"https://goeventserver.onrender.com/goevent/user/account/login"
+    response = await fetch(APIs.getAllData, {      //"https://goeventserver.onrender.com/goevent/user/account/login"
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -17,11 +17,7 @@ const getUserData = async (data) => {
   }
   const res = await response.json();
 
-  if(res.status==true){
-    return(res.res.data);
-  }else{
-    return res;
-  }
+  return res;
 }
 
-export {getUserData};
+export { GET_DATA };

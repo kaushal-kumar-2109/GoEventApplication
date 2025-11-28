@@ -5,7 +5,7 @@ const GETUSER =async (db) => {
   if(!db){
     db= await initDB();
   }
-  const allRows = await db.getAllAsync("SELECT * FROM User");
+  const allRows = await db.getAllAsync("SELECT * FROM userdata;");
   return allRows;
 }
 
@@ -14,36 +14,19 @@ const GETEVENTS =async (db) => {
   if (!db) {
     db= await initDB(); // ensure db is ready
   }
-  const allRows = await db.getAllAsync("SELECT * FROM EventsData");
+  const allRows = await db.getAllAsync("SELECT * FROM eventsdata");
   return allRows;
 }
 
-const GETSAVED =async (id,db) => {
+const VENDORS =async (db) => {
   
   if (!db) {
-    const db= await initDB();
+    db= await initDB(); // ensure db is ready
   }
-  const allRows = await db.getAllAsync(`SELECT * FROM BookMarks where USERID='${id}'`);
+  const allRows = await db.getAllAsync("SELECT * FROM vendordata");
   return allRows;
 }
 
-const GETSAVEDLIST =async (id,db) => {
-  
-  if (!db) {
-    const db= await initDB();
-  }
-  const allRows = await db.getAllAsync(`SELECT * FROM BookMarks where USERID='${id}'`);
-  let q="";
-  for(let i=0;i<allRows.length ;i++){
-    q=q+`id='${allRows[i].EVENTID}'`;
-    if(i<allRows.length-1){
-      q=q+" or ";
-    }
-  }
-  // console.log(allRows);
-  const allRowss = await db.getAllAsync(`SELECT * FROM EventsData where USERID='${id}' AND ${q}`);
-  return allRowss;
-}
 
 class GETDATASETS {
 
@@ -51,23 +34,30 @@ class GETDATASETS {
     console.log("class work fine");
   }
 
-  async fetchDataSet (id) {
-    console.log("initializing database and fetch data with id: ",id);
+  async fetchDataSet () {
+    console.log("initializing database and fetch ");
     const db= await initDB();
-    console.log("Fetching userData from database");
+
+    console.log("Fetching userData from database 🚫");
     let userData = await GETUSER(db);
-    console.log("got userData");
-    console.log("Fetching eventData from database");
+    console.log("got userData ✅");
+
+    if(userData.length<=0){
+      return ({STATUS:404,MES:"There is no user found"});
+    }
+    
+    console.log("Fetching eventData from database 🚫");
     let eventsData = await GETEVENTS(db);
-    console.log("got eventData");
-    console.log("Fetching getSavedData from database");
-    let getSaved = await GETSAVED(id,db);
-    console.log("got savedData");
-    console.log("Fetching Saved Event and Vendor from database");
-    let getSavedData = await GETSAVEDLIST(id,db);
-    console.log("got saved event and vendors");
-    return({UserData:userData[0],EventData:eventsData,SavedEvent_Vendor_list:getSaved,SavedEvent_Vendor_Data:getSavedData});
+    console.log("got eventData ✅");
+
+    console.log("Fetching vendors from database 🚫");
+    let vendorData = await VENDORS(db);
+    console.log("got vendorData ✅");
+
+    const result = {STATUS:200, UserData:userData[0],EventData:eventsData, VendorData:vendorData};
+    
+    return result;
   }
 
 }
-export {GETUSER,GETEVENTS,GETSAVED,GETSAVEDLIST,GETDATASETS}
+export {GETUSER,GETEVENTS,GETDATASETS}

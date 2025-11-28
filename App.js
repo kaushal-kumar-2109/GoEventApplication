@@ -4,25 +4,27 @@ import { useEffect, useState } from 'react';
 import { GETDATASETS, GETUSER } from './src/Database/Offline/oprations/Read';
 import Application from './src/Application/collector';
 import LottieView from 'lottie-react-native';
-import { getEventsData } from './utils/eventApis/fetchApis';
-import { AddToOffline } from './OfflineDataHandle/events';
+import { DELETETABLES } from './src/Database/Offline/oprations/Delete';
+import * as Network from 'expo-network';
+import { syncDatabase } from './utils/sync';
 
+import * as SQLite from "expo-sqlite";
+
+
+// DELETETABLES();
 const GETDATASET = new GETDATASETS();
 
 export default function App() {
-
   // user variable 
   const [getMainPageStack,setMainPageStack] = useState("");
   const [getLoader,setLoader] = useState(true);
-
   const [getAppData,setAppData] = useState(false);
 
   const checkUser = async () => {
-    const data = await GETUSER();
-    if(data && data[0]){
-      GETDATASET.check();
-      const dataSet =await GETDATASET.fetchDataSet(data[0].id);
-      setAppData(dataSet);
+    const data = await GETDATASET.fetchDataSet();
+    if(data.STATUS == 200){
+      setAppData(data);
+      // console.log("dataSet => ",dataSet);
       setMainPageStack(true);
     }else{
       setMainPageStack(false);
@@ -31,15 +33,9 @@ export default function App() {
     setLoader(false);
   }
 
-  const setupApp = async () => {
-    const res = await getEventsData({data:"none"});
-    const response = await AddToOffline(res);
-    console.log(response);
-  } 
-
   useEffect(()=>{
     checkUser();
-    setupApp();
+    SYNCPROCESS();
   },[setMainPageStack]);
 
   return (
@@ -56,7 +52,7 @@ export default function App() {
     </View>
 :
   <>
-    {(getMainPageStack=='none' || getMainPageStack == false)
+    {(getAppData == false || getMainPageStack == false)
     ?
       <View style={styles.container}>
         <UserSetup setMainPageStack={setMainPageStack}></UserSetup>
@@ -81,3 +77,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+
+const SYNCPROCESS = async () => {
+  const db = await SQLite.openDatabaseAsync("GoEvent");
+
+  const interval = setInterval(async () => {
+    console.log("trying sync......");
+    try{
+      const net = await Network.getNetworkStateAsync();
+      if (net.isConnected) {
+        console.log("✅ Device connected to the internet");
+        await syncDatabase(db);
+      }
+      else{
+        console.log("🚫 Device not connected to internet");
+      }
+    }catch(err){
+      console.log("🚫 Some error!");
+    }
+  }, 60000); // 1 min
+// 60000
+  // return () => clearInterval(interval);
+}

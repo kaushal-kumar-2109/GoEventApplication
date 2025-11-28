@@ -16,22 +16,39 @@ const UserSetup = ({setMainPageStack}) => {
     setMainPageStack(true);
   }
 
-  return (
+  //  =>  this is updated version of below return code if this not work then comment this and uncomment the below code.
+
+  return(
     <>
-      {(getPageStack[getPageStack.length-1]==="setCountry")
-        ? <ChooseCountry setPageStack={setPageStack} />
-        : (getPageStack[getPageStack.length-1]==="welcome")
-          ? <WelcomeScreen setPageStack={setPageStack} />
-          :(getPageStack[getPageStack.length-1] === "login")
-            ?(getPageStack[getPageStack.length-1] === "verification")
-              ?<Verification setPageStack={setPageStack} setMainPageStack={setMainPageStack}></Verification>
-              :<LoginPage setPageStack={setPageStack} />
-            :(getPageStack[getPageStack.length-1] === "verification")
-              ?<Verification setPageStack={setPageStack} setMainPageStack={setMainPageStack}></Verification>
-              :<SignupPage setPageStack={setPageStack}/>
-      }
+    {(getPageStack[getPageStack.length-1]==='setCountry' && <ChooseCountry setPageStack={setPageStack}></ChooseCountry>)}
+    {(getPageStack[getPageStack.length-1]==='welcome' && <WelcomeScreen setPageStack={setPageStack}></WelcomeScreen>)}
+    {(getPageStack[getPageStack.length-1]==='login' && <LoginPage setPageStack={setPageStack}></LoginPage>)}
+    {(getPageStack[getPageStack.length-1]==='verification' && <Verification setPageStack={setPageStack} setMainPageStack={setMainPageStack}></Verification>)}
+    {(getPageStack[getPageStack.length-1]==='signup' && <SignupPage setPageStack={setPageStack}></SignupPage>)}
+
     </>
   );
+
+  //  =>    This is an privious code if the upper not work properly then use it for the better performence and good result.
+  //  =>    for use this you should comment upper one and uncommet it .
+
+
+  // return (
+  //   <>
+  //     {(getPageStack[getPageStack.length-1]==="setCountry")
+  //       ? <ChooseCountry setPageStack={setPageStack} />
+  //       : (getPageStack[getPageStack.length-1]==="welcome")
+  //         ? <WelcomeScreen setPageStack={setPageStack} />
+  //         :(getPageStack[getPageStack.length-1] === "login")
+  //           ?(getPageStack[getPageStack.length-1] === "verification")
+  //             ?<Verification setPageStack={setPageStack} setMainPageStack={setMainPageStack}></Verification>
+  //             :<LoginPage setPageStack={setPageStack} />
+  //           :(getPageStack[getPageStack.length-1] === "verification")
+  //             ?<Verification setPageStack={setPageStack} setMainPageStack={setMainPageStack}></Verification>
+  //             :<SignupPage setPageStack={setPageStack}/>
+  //     }
+  //   </>
+  // );
 };
 
 export {UserSetup};
