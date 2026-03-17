@@ -1,11 +1,16 @@
 import { initDB } from "../connect";
+import { CheckInternet } from "../../../../utils/checkNetwork";
+import { Delete_Event_Online } from "../../online/oprations/delete";
+import * as SQLite from "expo-sqlite";
+import { Write_App_Log } from "./app_logs";
 
-const Delete_Userdata = async (DB) => {
+const Delete_Userdata = async (DB, USER_ID) => {
     if (!DB) {
         DB = await initDB();
     }
     console.log("Delete data from the USER_DATA");
     let res = await DB.getAllAsync("DROP TABLE USER_DATA;");
+    await Write_App_Log(DB, USER_ID, "WARN", "USER_DATA Table Dropped");
     return ({ STATUS: 200, DATA: res });
 }
 
@@ -15,13 +20,32 @@ const Delete_EventData = async (DB, UID, EID) => {
     }
     console.log("Delete data from the EventData");
     try {
-        let res = await DB.getAllAsync(`DELETE FROM EVENT_DATA WHERE EVENT_ID ='${EID}';`);
-        let res2 = await DB.getAllAsync(`INSERT INTO LOG_DATA VALUES ('${Create_Id()}','EVENT_DATA','${EID}','delete');`);
+        let res = await DB.runAsync("DELETE FROM EVENT_DATA WHERE EVENT_ID = ?", [EID]);
+        await Write_App_Log(DB, UID, "INFO", "Event Deleted Offline", `ID: ${EID}`);
+
+        if (CheckInternet()) {
+            const on_res = await Delete_Event_Online(UID, EID);
+            if (on_res.STATUS != 200) {
+                await DB.runAsync(
+                    "INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)",
+                    [Create_Id(), 'EVENT_DATA', EID, 'delete']
+                );
+                await Write_App_Log(DB, UID, "WARN", "Online Deletion Failed", `Pending sync for ${EID}`);
+            }
+        } else {
+            await DB.runAsync(
+                "INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)",
+                [Create_Id(), 'EVENT_DATA', EID, 'delete']
+            );
+            await Write_App_Log(DB, UID, "INFO", "Offline Deletion Logged", `Pending sync for ${EID}`);
+        }
+
         if (res) {
             return res;
         }
     } catch (err) {
         console.log("err", err);
+        await Write_App_Log(DB, UID || "SYSTEM", "ERROR", "Deletion Failed", err.message);
         return ({ STATUS: 500, DATA: err });
     }
     return false;

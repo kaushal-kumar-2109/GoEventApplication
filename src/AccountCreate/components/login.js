@@ -12,7 +12,6 @@ import { useState, useEffect } from "react";
 import { COLORS, FONTS } from "../../../public/global";
 import { Read_From_Online_userdata } from "../../../private/database/online/oprations/read";
 import { ForGotPassword } from "./forgetPassword";
-import { Load_Event_Data } from "../../../private/sync/read_online";
 
 // importing functions 
 // import { GET_USER_BY_EMAIL } from "../../Database/online/fetchApis";
@@ -49,7 +48,6 @@ const LoginPage = ({ setPageStack, getUserData, setUserData }) => {
 
     //function
     const loginAccount = async () => {
-        Load_Event_Data();
         setLoader(true);
         setMainError(false);
         (getUserEmail.trim() == '') ? setUserEmailErr('Email is Required❗') : setUserEmailErr(false);

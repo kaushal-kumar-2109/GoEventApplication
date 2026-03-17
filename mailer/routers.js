@@ -1,4 +1,4 @@
-const HOST_NETWORK_PATH = 'http://10.157.31.18:3000';
+const HOST_NETWORK_PATH = 'https://goeventserver.onrender.com';
 // http://localhost:3000/GoEvent/User
 // https://goeventserver.onrender.com
 

@@ -31,7 +31,8 @@ const Invite_User = ({ getDB, getPageStack, setPageStack }) => {
           EVENT_ABOUT: decryptData(eventData.DATA[0].EVENT_ABOUT),
           EVENT_BANNER: decryptData(eventData.DATA[0].EVENT_BANNER),
           EVENT_TYPE: decryptData(eventData.DATA[0].EVENT_TYPE),
-          USER_ID: eventData.DATA[0].USER_ID
+          USER_ID: eventData.DATA[0].USER_ID,
+          EVENT_CODE: eventData.DATA[0].EVENT_CODE
         }
 
         result = await Invite_User_By_Email(getDB, getAllData, eve);

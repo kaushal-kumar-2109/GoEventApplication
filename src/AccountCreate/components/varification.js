@@ -80,7 +80,7 @@ const Verification = ({ getDB, setPageStack, getPageStak, getUserData, setUserDa
       if (getUserData[1] === 'login') {
         console.log("Login ");
         const user = await Create_User(getDB, getUserData[0].USER_ID, getUserData, "login", "");
-        if (user.STATUS == 200 || user.STATUS) {
+        if (user.STATUS == 200) {
           console.log('data save! ✅');
           setLoader(false);
           await RELOADAPP();

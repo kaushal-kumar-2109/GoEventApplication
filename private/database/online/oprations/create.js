@@ -108,6 +108,7 @@ const Create_Event_Online = async (udata) => {
   const EVENT_BANNER = encryptData(udata[11]);
   const EVENT_CODE = udata[12];
   const EVENT_STATUS = udata[13];
+  const UPDATED_AT = udata[14];
 
   const { data, error } = await SUP_BASE
     .from("EVENT_DATA")
@@ -127,7 +128,8 @@ const Create_Event_Online = async (udata) => {
         EVENT_CREATED_AT,
         EVENT_BANNER,
         EVENT_CODE,
-        EVENT_STATUS
+        EVENT_STATUS,
+        UPDATED_AT
       },
     ]);
 
@@ -140,7 +142,53 @@ const Create_Event_Online = async (udata) => {
   }
 };
 
-export { Create_User_Online, random_USER, random_EVENT };
+const Create_Event_Invite_Online = async (DATA) => {
+  const USER_ID = DATA[1];
+  const { data, error } = await SUP_BASE
+    .from("EVENT_INVITATION")
+    .insert([
+      {
+        // omit ID, let database assign a bigint/serial value
+        INVITATION_ID: DATA[0],
+        HOST_ID: DATA[1],
+        MEMBER_EMAIL: DATA[2],
+        EVENT_ID: DATA[3],
+        STATUS: DATA[4],
+        CREATED_AT: DATA[5]
+      },
+    ]);
+
+  if (error) {
+    console.log("Insert Error:", error);
+    return ({ STATUS: 500, UID: USER_ID });
+  } else {
+    console.log("Inserted Successfully:");
+    return ({ STATUS: 200, UID: USER_ID });
+  }
+}
+
+const Create_App_Log_Online = async (logData) => {
+  const { data, error } = await SUP_BASE
+    .from("APP_LOGS")
+    .insert([
+      {
+        LOG_ID: logData.LOG_ID,
+        USER_ID: logData.USER_ID,
+        LOG_TIME: logData.LOG_TIME,
+        LOG_TYPE: logData.LOG_TYPE,
+        LOG_MESSAGE: logData.LOG_MESSAGE,
+        LOG_DETAIL: logData.LOG_DETAIL
+      },
+    ]);
+
+  if (error) {
+    console.log("Online Log Error:", error);
+    return { STATUS: 500, ERROR: error };
+  }
+  return { STATUS: 200 };
+}
+
+export { Create_User_Online, random_USER, Create_Event_Online, random_EVENT, Create_Event_Invite_Online, Create_App_Log_Online };
 
 
 const Create_Id = () => {

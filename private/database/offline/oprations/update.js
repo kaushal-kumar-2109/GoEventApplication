@@ -1,15 +1,41 @@
 import { initDB } from "../connect";
+import { CheckInternet } from "../../../../utils/checkNetwork";
+import { UPDATE_INVITE_OF_CUSTOMER_ONLINE } from "../../online/oprations/update";
+import { Write_App_Log } from "./app_logs";
 
-const UPDATE_INVITE_OF_CUSTOMER = async (DB, memberemail, eventid, status, invitation_id) => {
+const UPDATE_INVITE_OF_CUSTOMER = async (DB, USER_ID, memberemail, eventid, status, invitation_id) => {
   if (!DB) {
     DB = await initDB();
+    if (!DB) return { STATUS: 500, MES: "DB Init Failed" };
   }
 
-  const allRows = await DB.runAsync(`UPDATE EVENT_INVITATION SET STATUS='${status}' WHERE MEMBER_EMAIL = '${memberemail}' AND EVENT_ID = '${eventid}';`);
-  const updateRows = await DB.runAsync(`INSERT INTO LOG_DATA VALUES ('${Create_Id()}','EVENT_INVITATTION','${invitation_id}','UPDATE')`);
-  if (allRows.changes == 1) {
+  try {
+    const allRows = await DB.runAsync(
+      "UPDATE EVENT_INVITATION SET STATUS=? WHERE MEMBER_EMAIL = ? AND EVENT_ID = ?",
+      [status, memberemail, eventid]
+    );
+    await Write_App_Log(DB, USER_ID, "INFO", "Invitation Updated", `Member: ${memberemail}, Status: ${status}`);
+
+    if (CheckInternet()) {
+      let res = UPDATE_INVITE_OF_CUSTOMER_ONLINE(memberemail, eventid, status);
+      if (res.STATUS != 200) {
+        await DB.runAsync(
+          "INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)",
+          [Create_Id(), 'EVENT_INVITATION', invitation_id, 'UPDATE']
+        );
+        await Write_App_Log(DB, USER_ID, "WARN", "Online Invitation Sync Failed", `ID: ${invitation_id}`);
+      }
+    } else {
+      await DB.runAsync(
+        "INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)",
+        [Create_Id(), 'EVENT_INVITATION', invitation_id, 'UPDATE']
+      );
+      await Write_App_Log(DB, USER_ID, "INFO", "Offline Invitation Update Logged", `ID: ${invitation_id}`);
+    }
     return ({ STATUS: 200, MES: "Updated Successfully" });
-  } else {
+  } catch (error) {
+    console.log(error);
+    await Write_App_Log(DB, USER_ID, "ERROR", "Invitation Update Failed", error.message);
     return ({ STATUS: 500, MES: "Error in updating" });
   }
 }

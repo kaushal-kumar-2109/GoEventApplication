@@ -75,6 +75,7 @@ const QR_Scanner = ({ getDB, getPageStack, setPageStack }) => {
 
             let res = await UPDATE_INVITE_OF_CUSTOMER(
               getDB,
+              getEventData?.USER_ID || "SYSTEM",
               data.email,
               data.eventid,
               'ACCEPTED',

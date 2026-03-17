@@ -1,6 +1,7 @@
 import { initDB } from "../connect";
 import * as Crypto from "expo-crypto";
 import { decryptData } from "../../../../utils/Hash";
+import { CheckInternet } from "../../../../utils/checkNetwork";
 
 // duplicate of hashing helper from create.js; keep in sync
 const hashField = async (value) => {
@@ -32,10 +33,11 @@ const Read_From_userdata = async (DB) => {
 const Read_From_userdata_By_ID = async (DB, ID) => {
     if (!DB) {
         DB = await initDB();
+        if (!DB) return { STATUS: 500, MES: "DB Init Failed" };
     }
 
     try {
-        let res = await DB.getAllAsync(`SELECT * FROM USER_DATA WHERE USER_ID = '${ID}';`);
+        let res = await DB.getAllAsync("SELECT * FROM USER_DATA WHERE USER_ID = ?", [ID]);
         return ({ STATUS: 200, DATA: res });
     } catch (err) {
         console.log("Error in reading userdata:", err);
@@ -88,10 +90,11 @@ const Read_From_evetndata = async (DB) => {
 const Read_From_evetndata_By_ID = async (DB, ID) => {
     if (!DB) {
         DB = await initDB();
+        if (!DB) return { STATUS: 500, MES: "DB Init Failed" };
     }
 
     try {
-        let res = await DB.getAllAsync(`SELECT * FROM EVENT_DATA WHERE EVENT_ID = '${ID}';`);
+        let res = await DB.getAllAsync("SELECT * FROM EVENT_DATA WHERE EVENT_ID = ?", [ID]);
         // console.log("Event data : ",res);
         return ({ STATUS: 200, DATA: res });
     } catch (err) {
@@ -117,10 +120,11 @@ const Read_From_venderdata = async (DB) => {
 const Read_From_venderdata_By_ID = async (DB, ID) => {
     if (!DB) {
         DB = await initDB();
+        if (!DB) return { STATUS: 500, MES: "DB Init Failed" };
     }
     console.log("Reading data from the venderdata by ID : ", ID);
     try {
-        let res = await DB.getAllAsync(`SELECT * FROM vendordata WHERE Id = '${ID}';`);
+        let res = await DB.getAllAsync("SELECT * FROM vendordata WHERE Id = ?", [ID]);
         return ({ STATUS: 200, DATA: res });
     } catch (err) {
         console.log("Error in reading venderdata:", err);
@@ -133,10 +137,10 @@ const Read_All_Offline_Data = async (DB, USERID) => {
     try {
         if (!DB) {
             DB = await initDB();
-            console.log("Error int database connection");
+            if (!DB) return { STATUS: 500, MES: "DB Init Failed" };
         }
-        let events = await DB.getAllAsync(`SELECT * FROM EVENT_DATA where USER_ID = '${USERID}';`);
-        // let vendors = await DB.getAllAsync(`SELECT * FROM vendordata where USERID = '${USERID}';`);
+        let events = await DB.getAllAsync("SELECT * FROM EVENT_DATA where USER_ID = ?", [USERID]);
+        // let vendors = await DB.getAllAsync("SELECT * FROM vendordata where USERID = ?", [USERID]);
         if (events.length == 0) {
             events = false;
         }
@@ -154,9 +158,10 @@ const Read_From_InvitationList_By_EventID = async (DB, EVENTID) => {
 
     if (!DB) {
         DB = await initDB();
+        if (!DB) return { STATUS: 500, MES: "DB Init Failed" };
     }
     try {
-        let res = await DB.getAllAsync(`SELECT * FROM EVENT_INVITATION WHERE EVENT_ID = '${EVENTID}';`);
+        let res = await DB.getAllAsync("SELECT * FROM EVENT_INVITATION WHERE EVENT_ID = ?", [EVENTID]);
         return ({ STATUS: 200, DATA: res });
     } catch (err) {
         console.log("Error in reading invitation list:", err);

@@ -26,27 +26,47 @@ const hashPassword = async (password) => {
 };
 
 
-const Update_User_Data_Online = async (email,passord) => {
-    
-    const HASH_PASS = await hashPassword(passord);
+const Update_User_Data_Online = async (email, passord) => {
 
-    const { data, error } = await SUP_BASE
+  const HASH_PASS = await hashPassword(passord);
+
+  const { data, error } = await SUP_BASE
     .from("USER_DATA")
     .update(
-        {
-            USER_PASS: HASH_PASS,
-            UPDATED_AT: new Date().toISOString()
-        }
+      {
+        USER_PASS: HASH_PASS,
+        UPDATED_AT: new Date().toISOString()
+      }
     )
     .eq("USER_EMAIL", email);
 
-    if (error) {
-        console.log("Error:", error);
-        return ({STATUS:500});
-    } else {
-        // console.log("Data:", data);
-        return ({STATUS:200,DATA:data,UPASS:HASH_PASS});
-    }
+  if (error) {
+    console.log("Error:", error);
+    return ({ STATUS: 500 });
+  } else {
+    // console.log("Data:", data);
+    return ({ STATUS: 200, DATA: data, UPASS: HASH_PASS });
+  }
 }
 
-export { Update_User_Data_Online };
+const UPDATE_INVITE_OF_CUSTOMER_ONLINE = async (memberemail, eventid, status) => {
+  const { data, error } = await SUP_BASE
+    .from("EVENT_INVITATION")
+    .update(
+      {
+        STATUS: status,
+      }
+    )
+    .eq("MEMBER_EMAIL", memberemail)
+    .eq("EVENT_ID", eventid);
+
+  if (error) {
+    console.log("Error:", error);
+    return ({ STATUS: 500 });
+  } else {
+    // console.log("Data:", data);
+    return ({ STATUS: 200 });
+  }
+}
+
+export { Update_User_Data_Online, UPDATE_INVITE_OF_CUSTOMER_ONLINE };

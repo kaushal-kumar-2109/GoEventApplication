@@ -1,17 +1,31 @@
 // importing pri-build components 
-import React, { useState } from "react";
-import { View,Text,FlatList,TouchableOpacity,TextInput,StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Load_Event_Data } from "../../../private/sync/read_online";
 
-const countries = ["Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Italy",];
+const countries = ["Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Isle of Man", "Italy",];
 
-const ChooseCountry = ({setPageStack,getUserData,setUserData}) => {
+const ChooseCountry = ({ getDB, setPageStack, getUserData, setUserData }) => {
+
   const [search, setSearch] = useState("");
   const [selectedCountry, setSelectedCountry] = useState('India');
 
   const filteredCountries = countries.filter((c) =>
     c.toLowerCase().includes(search.toLowerCase())
   );
+
+  useEffect(() => {
+    const handleLoad = async () => {
+      try {
+        await Load_Event_Data(getDB);
+      } catch (err) {
+        console.log("Load Error:", err);
+      }
+    };
+
+    handleLoad();
+  }, []); // 👈 runs only once
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
@@ -50,9 +64,9 @@ const ChooseCountry = ({setPageStack,getUserData,setUserData}) => {
       />
 
       {/* Next Button */}
-      <TouchableOpacity style={styles.nextButton} 
-        onPress={()=>{
-          setUserData([...getUserData,selectedCountry]);
+      <TouchableOpacity style={styles.nextButton}
+        onPress={() => {
+          setUserData([...getUserData, selectedCountry]);
           setPageStack(prevStack => [...prevStack, "welcome"]);
         }}>
         <Text style={styles.nextText}>Next</Text>
@@ -61,11 +75,11 @@ const ChooseCountry = ({setPageStack,getUserData,setUserData}) => {
   );
 }
 
-export {ChooseCountry};
+export { ChooseCountry };
 
 const styles = StyleSheet.create({
   container: {
-    width:'100%',
+    width: '100%',
     flex: 1,
     backgroundColor: "#ffffff",
     paddingHorizontal: 16,
