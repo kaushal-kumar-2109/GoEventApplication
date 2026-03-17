@@ -116,7 +116,7 @@ const LoginPage = ({ setPageStack, getUserData, setUserData }) => {
                         ?
                         <ForGotPassword getUserData={getUserData} setUserData={setUserData} setForgotPassword={setForgotPassword} setPageStack={setPageStack}></ForGotPassword>
                         :
-                        <SafeAreaView style={[{ width: '100%', height: '100%' }]}>
+                        <SafeAreaView style={[{ width: '100%', height: '100%', backgroundColor: "#ffffff", }]}>
                             <ScrollView>
                                 {/* Header */}
                                 <View style={[{ display: 'flex', flexDirection: 'row', paddingHorizontal: 12 }]}>

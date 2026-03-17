@@ -56,7 +56,7 @@ const HomePage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack 
     const filterByCategory = (categoryName) => {
         setSelectedCategory(categoryName);
         if (categoryName === 'All') {
-            setEvents(getAllEvents.slice(0, 4));
+            setEvents(getAllEvents.slice(0, 8));
         } else {
             const filtered = getAllEvents.filter(event => {
                 return decryptData(event.EVENT_HIGHLIGHT).toLowerCase().includes(categoryName.toLowerCase())
@@ -155,7 +155,10 @@ const HomePage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack 
                                     <Text style={styles.viewAll}>View All</Text>
                                 </TouchableOpacity>
                             </View>
-                            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.vendorScroll}>
+                            <ScrollView
+                                style={[{ display: 'flex', flexDirection: 'row', gap: 10 }]}
+                                horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.vendorScroll}
+                            >
                                 {getVendors.length > 0 ? (
                                     getVendors.map((vendor, index) => (
                                         <VendorCard
@@ -286,7 +289,11 @@ const styles = StyleSheet.create({
         transform: [{ scale: 1.05 }],
     },
     cardList: {
-        flexDirection: 'column',
+        width: '100%',
+        justifyContent: 'space-evenly',
+        flexDirection: 'row',
+        gap: 10,
+        flexWrap: 'wrap',
         alignItems: 'center',
     },
     vendorScroll: {

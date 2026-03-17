@@ -200,7 +200,7 @@ const Verification = ({ getDB, setPageStack, getPageStak, getUserData, setUserDa
         />
       </View>
       :
-      <SafeAreaView style={{ width: '100%', height: '100%' }}>
+      <SafeAreaView style={{ width: '100%', height: '100%', backgroundColor: "#ffffff", }}>
         <ScrollView contentContainerStyle={{ paddingHorizontal: 12 }}>
           {/* Header */}
           <View style={{ flexDirection: 'row', paddingVertical: 20 }}>

@@ -42,19 +42,19 @@ const Event_Details = ({ getDB, getUserData, setUserData, getPageStack, setPageS
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" />
-            
+
             {getEventData && (
                 <>
                     <ScrollView showsVerticalScrollIndicator={false} style={styles.scroll}>
                         {/* Banner Image with Overlays */}
                         <View style={styles.bannerContainer}>
-                            <Image 
-                                source={{ uri: `${decryptData(getEventData.EVENT_BANNER)}` }} 
+                            <Image
+                                source={{ uri: `${decryptData(getEventData.EVENT_BANNER)}` }}
                                 style={styles.bannerImage}
                                 resizeMode="cover"
                             />
                             {/* Floating Back Button */}
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 style={styles.backBtn}
                                 onPress={() => setPageStack(prev => prev.slice(0, -1))}
                             >
@@ -154,8 +154,8 @@ const Event_Details = ({ getDB, getUserData, setUserData, getPageStack, setPageS
                     </View>
                 </>
             )}
-            
-            <FootBar setPageStack={setPageStack} getPageStack={getPageStack} />
+
+            {/* <FootBar setPageStack={setPageStack} getPageStack={getPageStack} /> */}
         </SafeAreaView>
     );
 };

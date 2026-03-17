@@ -76,7 +76,7 @@ const VendorPage = ({
     }, [getSearchValue, vendorData]);
 
     return (<>
-        <SafeAreaView style={[{ justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%' }]}>
+        <SafeAreaView style={[{ justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%', backgroundColor: "#ffffff", }]}>
             <View style={[{ justifyContent: 'center', alignItems: 'center' }]}>
                 <Text style={[{ fontSize: 20, fontWeight: 'bold', color: '#597ef7ff' }]}>COMMING SOON...</Text>
             </View>

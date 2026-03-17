@@ -108,7 +108,7 @@ const CreateForm = ({ getDB, getUserData, setUserData, setPageStack, getPageStac
     };
 
     return (
-        <SafeAreaView style={[{ width: '100%', height: '100%' }]}>
+        <SafeAreaView style={[{ width: '100%', height: '100%', backgroundColor: "#ffffff", }]}>
             {/* Header */}
             <View style={[{ display: 'flex', flexDirection: 'row', paddingHorizontal: 12 }]}>
                 <TouchableOpacity

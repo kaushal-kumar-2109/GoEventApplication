@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { useEffect, useState } from 'react';
+import * as NavigationBar from 'expo-navigation-bar';
 
 //importing created files
 import { Account_Create_Collector } from './src/AccountCreate/collector';
@@ -10,6 +11,7 @@ import { initDB } from './private/database/offline/connect';
 import { Read_From_userdata } from './private/database/offline/oprations/read';
 import Application from './src/Application/collector';
 import { Load_Event_Invitation } from './private/sync/read_online';
+
 // import { Delete_Unwanted_Event } from './private/sync/wright_offline';
 
 export default function App() {
@@ -29,6 +31,12 @@ export default function App() {
   }
 
   useEffect(() => {
+    const setupUI = async () => {
+      await NavigationBar.setVisibilityAsync("hidden");
+      await NavigationBar.setBehaviorAsync("overlay-swipe");
+    };
+
+    setupUI();
     CheckUser();
   }, []);
 

@@ -14,8 +14,8 @@ const EventCard = ({ DATA, color, getPageStack, setPageStack }) => {
             style={Style.Card}>
 
             <View style={Style.ImageContainer}>
-                <Image 
-                    source={{ uri: `${decryptData(DATA.EVENT_BANNER)}` }} 
+                <Image
+                    source={{ uri: `${decryptData(DATA.EVENT_BANNER)}` }}
                     style={Style.CardImage}
                     resizeMode="cover"
                 />
@@ -31,7 +31,7 @@ const EventCard = ({ DATA, color, getPageStack, setPageStack }) => {
                 <Text style={Style.Title} numberOfLines={1} ellipsizeMode="tail">
                     {decryptData(DATA.EVENT_NAME)}
                 </Text>
-                
+
                 <View style={Style.DetailRow}>
                     <View style={Style.DetailItem}>
                         <EvilIcons name="calendar" size={20} color={COLORS.subtext} />
@@ -49,15 +49,15 @@ const EventCard = ({ DATA, color, getPageStack, setPageStack }) => {
                 </View>
 
                 <View style={Style.Footer}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         onPress={() => typeof saveToBookMark === 'function' && saveToBookMark(DATA.id, DATA.UserId)}
                         style={Style.BookmarkBtn}
                     >
                         <FontAwesome5 name="bookmark" size={16} color={color || COLORS.primary} />
                     </TouchableOpacity>
-                    
+
                     <View style={Style.CategoryBadge}>
-                         <Text style={Style.CategoryText}>{decryptData(DATA.EVENT_HIGHLIGHT)}</Text>
+                        <Text style={Style.CategoryText}>{decryptData(DATA.EVENT_HIGHLIGHT)}</Text>
                     </View>
                 </View>
             </View>
@@ -70,7 +70,7 @@ export { EventCard };
 
 const Style = StyleSheet.create({
     Card: {
-        width: '45%',
+        width: 250,
         backgroundColor: '#ffffff',
         borderRadius: 15,
         marginBottom: 20,
