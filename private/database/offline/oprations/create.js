@@ -57,21 +57,19 @@ const Create_User = async (DB, UID, data, task, hashPass) => {
     DB = await initDB();
     if (!DB) return { STATUS: 500, MES: "DB Init Failed" };
   }
-
   try {
     let res;
     if (task == "signup") {
-      const rawName = data[0][1];
-      const rawEmail = data[0][0];
-      const rawPass = data[0][3];
-      const rawNumber = data[0][2];
+      const rawName = data[1][1];
+      const rawEmail = data[1][0];
+      const rawPass = data[1][3];
+      const rawNumber = data[1][2];
 
       const hashedName = await encryptData(rawName);
       const hashedEmail = await encryptData(rawEmail);
       const hashedNumber = await encryptData(rawNumber);
       const USER_HASH_EMAIL = await hashField(rawEmail);
       const hashedPass = await hashPassword(rawPass);
-
       res = await DB.runAsync(
         "INSERT INTO USER_DATA (USER_ID, CREATED_AT, USER_NAME, USER_EMAIL, UPDATED_AT, USER_PASS, USER_NUMBER, USER_HASH_EMAIL, USER_STATUS, USER_PIC) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
@@ -123,10 +121,12 @@ const Create_User = async (DB, UID, data, task, hashPass) => {
       );
     }
     await Write_App_Log(DB, UID, "INFO", `User ${task} Successful`, `UID: ${UID}`);
+    console.log("log saved ");
     return ({ STATUS: 200, DATA: res });
   } catch (err) {
     console.log("Error in the storing data : ", err);
     await Write_App_Log(DB, UID, "ERROR", `User ${task} Failed`, err.message);
+    console.log(" error log saved");
     return ({ STATUS: 500, MES: err.message || "Database Error" });
   }
 }
