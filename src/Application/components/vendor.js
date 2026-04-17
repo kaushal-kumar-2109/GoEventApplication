@@ -158,14 +158,15 @@ const styles = StyleSheet.create({
 
 //                 {/* SIDEBAR */}
 //                 {getSideBar &&
-
+//
 //                     <SideBar
 //                         setSideBar={setSideBar}
 //                         getUserData={getUserData}
 //                         getPageStack={getPageStack}
 //                         setPageStack={setPageStack}
+//                         setUserData={setUserData}
 //                     />
-
+//
 //                 }
 
 

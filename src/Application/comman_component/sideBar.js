@@ -9,11 +9,10 @@ import { useState, useEffect } from "react";
 
 import { FONTS, COLORS } from '../../../public/global';
 import { Delete_Userdata } from "../../../private/database/offline/oprations/delete";
-import { RELOADAPP } from "../../../utils/reloadApp";
 import { decryptData } from "../../../utils/Hash";
 
 
-const SideBar = ({ getDB, getUserData, setSideBar, getPageStack, setPageStack }) => {
+const SideBar = ({ getDB, getUserData, setSideBar, getPageStack, setPageStack, setUserData }) => {
 
     const [getHomeColor, setHomeColor] = useState();
     const [getEventColor, setEventColor] = useState();
@@ -166,10 +165,22 @@ const SideBar = ({ getDB, getUserData, setSideBar, getPageStack, setPageStack })
                                     {
                                         text: "Yes",
                                         onPress: async () => {
-                                            let res = await Delete_Userdata(getDB);
-                                            if (res.STATUS == 200) {
-                                                console.log("User Deleted !")
-                                                RELOADAPP();
+                                            console.log("Logout initiated...");
+                                            try {
+                                                const userId = getUserData && getUserData[0] ? getUserData[0].USER_ID : null;
+                                                let res = await Delete_Userdata(getDB, userId);
+                                                console.log("Delete_Userdata response:", res);
+                                                if (res.STATUS == 200) {
+                                                    console.log("User data deleted successfully! ✅");
+                                                    setSideBar(false);
+                                                    setUserData(false);
+                                                } else {
+                                                    console.log("Delete_Userdata failed:", res.MES);
+                                                    Alert.alert("Error", "Could not logout. Please try again.");
+                                                }
+                                            } catch (error) {
+                                                console.log("Logout exception:", error);
+                                                Alert.alert("Error", "An unexpected error occurred during logout.");
                                             }
                                         }
                                     }

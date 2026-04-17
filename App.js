@@ -1,3 +1,4 @@
+// app.js => file
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { useEffect, useState } from 'react';
@@ -42,7 +43,7 @@ export default function App() {
 
   return (<>
     {!getUserData &&
-      <Account_Create_Collector getDB={getDB}></Account_Create_Collector>
+      <Account_Create_Collector getDB={getDB} CheckUser={CheckUser}></Account_Create_Collector>
     }
     {getUserData &&
       <Application getDB={getDB} getUserData={getUserData} setUserData={setUserData}></Application>

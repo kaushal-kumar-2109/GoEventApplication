@@ -114,6 +114,7 @@ const EventPage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack
                         getUserData={getUserData}
                         getPageStack={getPageStack}
                         setPageStack={setPageStack}
+                        setUserData={setUserData}
                     />
                 }
 

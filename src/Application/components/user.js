@@ -43,7 +43,7 @@ const UserPage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack 
             <SafeAreaView style={[styles.container]}>
                 <NavBar setPageStack={setPageStack} getUserData={getUserData} title={'Profile'} style={[{ position: 'fixed' }]} setSideBar={setSideBar}></NavBar>
                 {getSideBar &&
-                    <SideBar getDB={getDB} setSideBar={setSideBar} getUserData={getUserData} getPageStack={getPageStack} setPageStack={setPageStack}></SideBar>
+                    <SideBar getDB={getDB} setSideBar={setSideBar} getUserData={getUserData} getPageStack={getPageStack} setPageStack={setPageStack} setUserData={setUserData}></SideBar>
                 }
 
 

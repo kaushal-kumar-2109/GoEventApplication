@@ -7,12 +7,11 @@ import LottieView from 'lottie-react-native';
 import { COLORS, FONTS } from "../../../public/global";
 import { CheckInternet } from "../../../utils/checkNetwork";
 import { SendEmail } from "../../../mailer/sendMail";
-import { RELOADAPP } from "../../../utils/reloadApp";
 import { Create_User } from "../../../private/database/offline/oprations/create";
 import { Create_User_Online } from "../../../private/database/online/oprations/create";
 import { Update_User_Data_Online } from "../../../private/database/online/oprations/update";
 
-const Verification = ({ getDB, setPageStack, getPageStak, getUserData, setUserData }) => {
+const Verification = ({ getDB, setPageStack, getPageStak, getUserData, setUserData, CheckUser }) => {
 
   const [getLoader, setLoader] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(null); // track which input is active
@@ -83,11 +82,11 @@ const Verification = ({ getDB, setPageStack, getPageStak, getUserData, setUserDa
         if (user.STATUS == 200) {
           console.log('data save! ✅');
           setLoader(false);
-          await RELOADAPP();
+          await CheckUser();
         } else {
           setLoader(false);
           setError("Data Not Save ! Try Again");
-          await RELOADAPP();
+          await CheckUser();
         }
       }
 
@@ -99,11 +98,11 @@ const Verification = ({ getDB, setPageStack, getPageStak, getUserData, setUserDa
           if (online.STATUS == 200) {
             console.log('data save! ✅');
             setLoader(false);
-            await RELOADAPP();
+            await CheckUser();
           } else {
             console.log("user creted offline not online");
             setLoader(false);
-            await RELOADAPP();
+            await CheckUser();
           }
         }
         else {
@@ -121,16 +120,16 @@ const Verification = ({ getDB, setPageStack, getPageStak, getUserData, setUserDa
           if (user.STATUS == 200) {
             console.log('data save! ✅');
             setLoader(false);
-            await RELOADAPP();
+            await CheckUser();
           } else {
             console.log("user not created try again !");
             setLoader(false);
-            await RELOADAPP();
+            await CheckUser();
           }
         } else {
           setLoader(false);
           setError("There is an issue try again !");
-          await RELOADAPP();
+          await CheckUser();
         }
 
         // if(user.STATUS==200){

@@ -9,9 +9,14 @@ const Delete_Userdata = async (DB, USER_ID) => {
         DB = await initDB();
     }
     console.log("Delete data from the USER_DATA");
-    let res = await DB.getAllAsync("DROP TABLE USER_DATA;");
-    await Write_App_Log(DB, USER_ID, "WARN", "USER_DATA Table Dropped");
-    return ({ STATUS: 200, DATA: res });
+    try {
+        await DB.execAsync("DROP TABLE IF EXISTS USER_DATA;");
+        await Write_App_Log(DB, USER_ID || "LOGOUT", "WARN", "USER_DATA Table Dropped");
+        return ({ STATUS: 200 });
+    } catch (err) {
+        console.log("Error dropping table:", err);
+        return ({ STATUS: 500, MES: err.message });
+    }
 }
 
 const Delete_EventData = async (DB, UID, EID) => {

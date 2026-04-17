@@ -71,7 +71,7 @@ const HomePage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack 
                 <NavBar setPageStack={setPageStack} getUserData={getUserData} title={'Home'} setSideBar={setSideBar} />
 
                 {getSideBar &&
-                    <SideBar getDB={getDB} setSideBar={setSideBar} getUserData={getUserData} getPageStack={getPageStack} setPageStack={setPageStack} />
+                    <SideBar getDB={getDB} setSideBar={setSideBar} getUserData={getUserData} getPageStack={getPageStack} setPageStack={setPageStack} setUserData={setUserData} />
                 }
 
                 <ScrollView showsVerticalScrollIndicator={false}>
