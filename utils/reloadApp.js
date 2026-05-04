@@ -1,5 +1,9 @@
+// Source module for application logic.
 import { DevSettings } from 'react-native';
 
+/**
+ * RELOADAPP.
+ */
 const RELOADAPP = async () => {
   console.log('h1');
   try{

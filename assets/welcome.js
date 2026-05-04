@@ -1,3 +1,4 @@
+// Source module for application logic.
 import React from "react";
 import { View,Text,Image,StyleSheet,TouchableOpacity,ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -55,6 +56,7 @@ const WelcomeScreen = ({setPageStack}) => {
 
 export {WelcomeScreen};
 
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
   container: {
     flex: 1,

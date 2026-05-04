@@ -1,35 +1,41 @@
-import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar, Platform } from 'react-native';
+// React component and screen logic for the app.
+import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar, Platform, Dimensions, Share, Alert, ActivityIndicator, Modal, TextInput, KeyboardAvoidingView } from 'react-native';
 import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import Entypo from '@expo/vector-icons/Entypo';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import Feather from '@expo/vector-icons/Feather';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { COLORS, FONTS, SPACING } from '../../../public/global';
+import { Ionicons, FontAwesome5, MaterialIcons, Feather, Entypo } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
-// importing the created files 
-import { FootBar } from '../comman_component/footer';
 import { Read_From_evetndata_By_ID } from '../../../private/database/offline/oprations/read';
-import { Read_From_userdata_By_ID } from '../../../private/database/offline/oprations/read';
+import { Create_Booking } from '../../../private/database/offline/oprations/create';
 import { decryptData } from '../../../utils/Hash';
 
+const { width } = Dimensions.get('window');
+
+import { useTheme } from '../../../context/ThemeContext';
+import { APIs } from '../../../mailer/routers';
+
+/**
+ * Event Details.
+ */
 const Event_Details = ({ getDB, getUserData, setUserData, getPageStack, setPageStack }) => {
+    const { colors: theme, isDarkMode } = useTheme();
 
     const [getEventData, setEventData] = useState(false);
-    // const [getEventCeatorData, setEventCreatorData] = useState(false);
     const [getHighLights, setHighLights] = useState([]);
+    const [isBooking, setIsBooking] = useState(false);
+    const [showBookingForm, setShowBookingForm] = useState(false);
+    const [attendeeData, setAttendeeData] = useState({ name: '', email: '', number: '', gender: '' });
 
+    /**
+     * Set Page Data.
+     */
     const setPageData = async () => {
         const eventID = getPageStack[getPageStack.length - 1].split('.')[1];
         const event = await Read_From_evetndata_By_ID(getDB, eventID);
-        setHighLights(decryptData(event.DATA[0].EVENT_HIGHLIGHT).split(','));
-        if (event.STATUS == 200) {
-            // const creatorData = await Read_From_userdata_By_ID(getDB, event.DATA[0].USER_ID);
+        if (event.STATUS == 200 && event.DATA.length > 0) {
             setEventData(event.DATA[0]);
-            // setEventCreatorData(creatorData.DATA[0]);
-
+            const highlights = decryptData(event.DATA[0].EVENT_HIGHLIGHT);
+            setHighLights(highlights ? highlights.split(',') : []);
         } else {
             console.log("Error in reading event data:", event.DATA);
         }
@@ -39,216 +45,410 @@ const Event_Details = ({ getDB, getUserData, setUserData, getPageStack, setPageS
         setPageData();
     }, []);
 
+    /**
+     * On Share.
+     */
+    const onShare = async () => {
+        try {
+            await Share.share({
+                message: `Check out this event: ${decryptData(getEventData.EVENT_NAME)} at ${decryptData(getEventData.EVENT_LOCATION)}!`,
+            });
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+
+    /**
+     * Handles  booking logic for the application.
+     */
+    const handleBooking = async () => {
+        if (!attendeeData.name || !attendeeData.email || !attendeeData.number || !attendeeData.gender) {
+            Alert.alert("Required", "Please fill in all details.");
+            return;
+        }
+        if (isBooking) return;
+
+        setIsBooking(true);
+        const eventName = decryptData(getEventData.EVENT_NAME);
+        const eventId = getEventData.EVENT_ID;
+        const userId = getUserData[0].USER_ID;
+
+        try {
+            const res = await Create_Booking(getDB, userId, eventId, eventName, attendeeData);
+            if (res.STATUS === 200) {
+                // Send Email Notification
+                try {
+                    const eventData = {
+                        EVENT_ID: getEventData.EVENT_ID,
+                        EVENT_NAME: decryptData(getEventData.EVENT_NAME),
+                        EVENT_DATE: decryptData(getEventData.EVENT_DATE),
+                        EVENT_LOCATION: decryptData(getEventData.EVENT_LOCATION),
+                        EVENT_TIME: decryptData(getEventData.EVENT_TIME)
+                    };
+                    const userData = [{
+                        name: attendeeData.name,
+                        email: attendeeData.email,
+                        number: attendeeData.number
+                    }];
+                    
+                    const mailRes = await fetch(`${APIs.sendInvitation}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ users: userData, event: eventData })
+                    });
+                    
+                    const mailData = await mailRes.json();
+                    if (mailData.STATUS !== 200) {
+                        console.log("Email failed:", mailData);
+                    }
+                } catch (e) {
+                    console.log("Error sending confirmation email:", e);
+                }
+
+                setShowBookingForm(false);
+                Alert.alert(
+                    "Success! 🎉",
+                    `You have successfully booked your spot for ${eventName}. Check your notifications for details.`,
+                    [{ text: "Great!", onPress: () => setPageStack(prev => prev.slice(0, -1)) }]
+                );
+            } else {
+                Alert.alert("Error", "Booking failed. Please try again.");
+            }
+        } catch (err) {
+            Alert.alert("Error", "Something went wrong.");
+        } finally {
+            setIsBooking(false);
+        }
+    };
+
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="dark-content" />
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+            <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
 
             {getEventData && (
                 <>
-                    <ScrollView showsVerticalScrollIndicator={false} style={styles.scroll}>
-                        {/* Banner Image with Overlays */}
+                    <ScrollView showsVerticalScrollIndicator={false} style={styles.scroll} stickyHeaderIndices={[0]}>
+                        <View style={styles.stickyHeader}>
+                            <View style={styles.headerButtons}>
+                                <TouchableOpacity
+                                    style={[styles.headerBtn, { backgroundColor: 'rgba(0,0,0,0.3)' }]}
+                                    onPress={() => setPageStack(prev => prev.slice(0, -1))}
+                                >
+                                    <Ionicons name="arrow-back" size={24} color="#fff" />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.headerBtn, { backgroundColor: 'rgba(0,0,0,0.3)' }]}
+                                    onPress={onShare}
+                                >
+                                    <Ionicons name="share-social-outline" size={24} color="#fff" />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
                         <View style={styles.bannerContainer}>
                             <Image
                                 source={{ uri: `${decryptData(getEventData.EVENT_BANNER)}` }}
                                 style={styles.bannerImage}
                                 resizeMode="cover"
                             />
-                            {/* Floating Back Button */}
-                            <TouchableOpacity
-                                style={styles.backBtn}
-                                onPress={() => setPageStack(prev => prev.slice(0, -1))}
-                            >
-                                <Ionicons name="arrow-back" size={24} color="#000" />
-                            </TouchableOpacity>
-
-                            {/* Type Badge */}
-                            <View style={styles.typeBadge}>
+                            <LinearGradient
+                                colors={['transparent', isDarkMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(248, 250, 252, 0.9)']}
+                                style={styles.bannerOverlay}
+                            />
+                            <View style={[styles.typeBadge, { backgroundColor: theme.primary }]}>
                                 <Text style={styles.typeText}>{decryptData(getEventData.EVENT_TYPE)}</Text>
                             </View>
                         </View>
 
-                        <View style={styles.content}>
-                            {/* Title and Badge */}
-                            <View style={styles.headerRow}>
-                                <Text style={styles.title}>{decryptData(getEventData.EVENT_NAME)}</Text>
-                                <View style={styles.priceTag}>
-                                    <FontAwesome5 name="rupee-sign" size={14} color="#fff" />
-                                    <Text style={styles.priceText}>
-                                        {decryptData(getEventData.EVENT_AMOUNT) === '0' ? "Free" : decryptData(getEventData.EVENT_AMOUNT)}
-                                    </Text>
+                        <View style={[styles.content, { backgroundColor: theme.background }]}>
+                            <View style={styles.titleSection}>
+                                <Text style={[styles.title, { color: theme.text }]}>{decryptData(getEventData.EVENT_NAME)}</Text>
+                                <View style={styles.priceRow}>
+                                    <LinearGradient
+                                        colors={[theme.primary, isDarkMode ? '#1E3A8A' : '#4F46E5']}
+                                        start={{ x: 0, y: 0 }}
+                                        end={{ x: 1, y: 0 }}
+                                        style={styles.priceBadge}
+                                    >
+                                        <FontAwesome5 name="rupee-sign" size={14} color="#fff" />
+                                        <Text style={styles.priceText}>
+                                            {decryptData(getEventData.EVENT_AMOUNT) === '0' ? "Free Entry" : `${decryptData(getEventData.EVENT_AMOUNT)}`}
+                                        </Text>
+                                    </LinearGradient>
+                                    <Text style={[styles.creatorInfo, { color: theme.subtext }]}>By {getEventData.EVENT_CODE}</Text>
                                 </View>
                             </View>
 
-                            <Text style={styles.creatorInfo}>Created by {getEventData.EVENT_CODE}</Text>
-
-                            {/* Detail Cards Row */}
                             <View style={styles.infoGrid}>
-                                <View style={styles.infoCard}>
-                                    <View style={[styles.iconCircle, { backgroundColor: '#eef2ff' }]}>
-                                        <FontAwesome name="calendar" size={18} color="#4f46e5" />
+                                <View style={[styles.infoCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                                    <View style={[styles.iconCircle, { backgroundColor: isDarkMode ? '#1E293B' : '#EEF2FF' }]}>
+                                        <Ionicons name="calendar" size={20} color={theme.primary} />
                                     </View>
                                     <View>
-                                        <Text style={styles.infoLabel}>Date</Text>
-                                        <Text style={styles.infoValue}>{decryptData(getEventData.EVENT_DATE)}</Text>
+                                        <Text style={[styles.infoLabel, { color: theme.subtext }]}>Date</Text>
+                                        <Text style={[styles.infoValue, { color: theme.text }]}>{decryptData(getEventData.EVENT_DATE)}</Text>
                                     </View>
                                 </View>
 
-                                <View style={styles.infoCard}>
-                                    <View style={[styles.iconCircle, { backgroundColor: '#fff7ed' }]}>
-                                        <AntDesign name="field-time" size={18} color="#f97316" />
+                                <View style={[styles.infoCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                                    <View style={[styles.iconCircle, { backgroundColor: isDarkMode ? '#1E293B' : '#FFF7ED' }]}>
+                                        <Feather name="clock" size={20} color="#F97316" />
                                     </View>
                                     <View>
-                                        <Text style={styles.infoLabel}>Time</Text>
-                                        <Text style={styles.infoValue}>{decryptData(getEventData.EVENT_TIME)}</Text>
+                                        <Text style={[styles.infoLabel, { color: theme.subtext }]}>Time</Text>
+                                        <Text style={[styles.infoValue, { color: theme.text }]}>{decryptData(getEventData.EVENT_TIME)}</Text>
                                     </View>
                                 </View>
                             </View>
 
-                            <View style={styles.infoCardWide}>
-                                <View style={[styles.iconCircle, { backgroundColor: '#f0fdf4' }]}>
-                                    <Entypo name="location" size={18} color="#22c55e" />
+                            <TouchableOpacity style={[styles.locationCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                                <View style={[styles.iconCircle, { backgroundColor: isDarkMode ? '#1E293B' : '#F0FDF4' }]}>
+                                    <Ionicons name="location" size={22} color="#22C55E" />
                                 </View>
                                 <View style={{ flex: 1 }}>
-                                    <Text style={styles.infoLabel}>Location</Text>
-                                    <Text style={styles.infoValue} numberOfLines={2}>{decryptData(getEventData.EVENT_LOCATION)}</Text>
+                                    <Text style={[styles.infoLabel, { color: theme.subtext }]}>Location</Text>
+                                    <Text style={[styles.infoValue, { color: theme.text }]} numberOfLines={2}>{decryptData(getEventData.EVENT_LOCATION)}</Text>
                                 </View>
+                                <MaterialIcons name="keyboard-arrow-right" size={24} color={theme.subtext} />
+                            </TouchableOpacity>
+
+                            <View style={styles.section}>
+                                <Text style={[styles.sectionTitle, { color: theme.text }]}>About Event</Text>
+                                <Text style={[styles.aboutText, { color: isDarkMode ? '#94A3AF' : '#475569' }]}>{decryptData(getEventData.EVENT_ABOUT)}</Text>
                             </View>
 
-                            {/* About Section */}
-                            <View style={styles.section}>
-                                <Text style={styles.sectionTitle}>About Event</Text>
-                                <Text style={styles.aboutText}>{decryptData(getEventData.EVENT_ABOUT)}</Text>
-                            </View>
-
-                            {/* Highlights Section */}
-                            <View style={styles.section}>
-                                <Text style={styles.sectionTitle}>Highlights</Text>
-                                <View style={styles.highlightWrapper}>
-                                    {getHighLights.map((highlight, i) => (
-                                        <View key={i} style={styles.highlightChip}>
-                                            <FontAwesome name="check-circle" size={14} color={COLORS.primary} />
-                                            <Text style={styles.highlightText}>{highlight.trim()}</Text>
-                                        </View>
-                                    ))}
+                            {getHighLights.length > 0 && (
+                                <View style={styles.section}>
+                                    <Text style={[styles.sectionTitle, { color: theme.text }]}>Event Highlights</Text>
+                                    <View style={styles.highlightWrapper}>
+                                        {getHighLights.map((highlight, i) => (
+                                            highlight.trim() !== "" && (
+                                                <View key={i} style={[styles.highlightChip, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                                                    <Ionicons name="checkmark-circle" size={16} color={theme.primary} />
+                                                    <Text style={[styles.highlightText, { color: theme.text }]}>{highlight.trim()}</Text>
+                                                </View>
+                                            )
+                                        ))}
+                                    </View>
                                 </View>
-                            </View>
+                            )}
 
-                            {/* Spacer for bottom button */}
-                            <View style={{ height: 120 }} />
+                            <View style={{ height: 150 }} />
                         </View>
                     </ScrollView>
 
-                    {/* Bottom Action Area */}
-                    <View style={styles.bottomBar}>
-                        {getEventData.EVENT_TYPE.toLowerCase() !== 'private' ? (
-                            <TouchableOpacity style={styles.joinBtn}>
-                                <Text style={styles.joinBtnText}>Join Event Now</Text>
-                                <AntDesign name="arrowright" size={20} color="#fff" style={{ marginLeft: 10 }} />
+                    <View style={styles.bottomAction}>
+                        <LinearGradient
+                            colors={['transparent', theme.background]}
+                            style={styles.bottomBlur}
+                        />
+                        {decryptData(getEventData.EVENT_TYPE).toLowerCase() === 'public' ? (
+                            <TouchableOpacity activeOpacity={0.9} style={styles.mainBtn} onPress={() => setShowBookingForm(true)}>
+                                <LinearGradient
+                                    colors={[theme.primary, isDarkMode ? '#1E3A8A' : '#4F46E5']}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    style={styles.btnGradient}
+                                >
+                                    <Text style={styles.btnText}>{isBooking ? "Booking..." : "Reserve Your Spot"}</Text>
+                                    {isBooking ? (
+                                        <ActivityIndicator size="small" color="#fff" />
+                                    ) : (
+                                        <Ionicons name="arrow-forward" size={22} color="#fff" />
+                                    )}
+                                </LinearGradient>
                             </TouchableOpacity>
                         ) : (
-                            <View style={[styles.joinBtn, { backgroundColor: '#94a3b8' }]}>
-                                <Feather name="lock" size={18} color="#fff" />
-                                <Text style={[styles.joinBtnText, { marginLeft: 10 }]}>Private Event</Text>
+                            <View style={[styles.mainBtn, { opacity: 0.7 }]}>
+                                <LinearGradient
+                                    colors={['#94A3B8', '#64748B']}
+                                    style={styles.btnGradient}
+                                >
+                                    <Feather name="lock" size={20} color="#fff" />
+                                    <Text style={[styles.btnText, { marginLeft: 10 }]}>Private Event Only</Text>
+                                </LinearGradient>
                             </View>
                         )}
                     </View>
+
+                    <Modal visible={showBookingForm} animationType="slide" transparent={true} onRequestClose={() => setShowBookingForm(false)}>
+                        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalOverlay}>
+                            <View style={[styles.modalContent, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                                <View style={styles.modalHeader}>
+                                    <Text style={[styles.modalTitle, { color: theme.text }]}>Attendee Details</Text>
+                                    <TouchableOpacity onPress={() => setShowBookingForm(false)}>
+                                        <Ionicons name="close" size={24} color={theme.text} />
+                                    </TouchableOpacity>
+                                </View>
+                                
+                                <ScrollView showsVerticalScrollIndicator={false}>
+                                    <View style={styles.inputGroup}>
+                                        <Text style={[styles.inputLabel, { color: theme.text }]}>Full Name</Text>
+                                        <TextInput 
+                                            style={[styles.input, { backgroundColor: theme.background, color: theme.text, borderColor: theme.border }]} 
+                                            placeholder="Enter your name"
+                                            placeholderTextColor={theme.subtext}
+                                            value={attendeeData.name}
+                                            onChangeText={text => setAttendeeData({...attendeeData, name: text})}
+                                        />
+                                    </View>
+                                    
+                                    <View style={styles.inputGroup}>
+                                        <Text style={[styles.inputLabel, { color: theme.text }]}>Email Address</Text>
+                                        <TextInput 
+                                            style={[styles.input, { backgroundColor: theme.background, color: theme.text, borderColor: theme.border }]} 
+                                            placeholder="Enter your email"
+                                            placeholderTextColor={theme.subtext}
+                                            keyboardType="email-address"
+                                            autoCapitalize="none"
+                                            value={attendeeData.email}
+                                            onChangeText={text => setAttendeeData({...attendeeData, email: text})}
+                                        />
+                                    </View>
+                                    
+                                    <View style={styles.inputGroup}>
+                                        <Text style={[styles.inputLabel, { color: theme.text }]}>Phone Number</Text>
+                                        <TextInput 
+                                            style={[styles.input, { backgroundColor: theme.background, color: theme.text, borderColor: theme.border }]} 
+                                            placeholder="Enter your number"
+                                            placeholderTextColor={theme.subtext}
+                                            keyboardType="phone-pad"
+                                            value={attendeeData.number}
+                                            onChangeText={text => setAttendeeData({...attendeeData, number: text})}
+                                        />
+                                    </View>
+                                    
+                                    <View style={styles.inputGroup}>
+                                        <Text style={[styles.inputLabel, { color: theme.text }]}>Gender</Text>
+                                        <View style={styles.genderRow}>
+                                            {['Male', 'Female', 'Other'].map((g) => (
+                                                <TouchableOpacity 
+                                                    key={g} 
+                                                    style={[styles.genderBtn, { borderColor: theme.border }, attendeeData.gender === g && { backgroundColor: theme.primary, borderColor: theme.primary }]}
+                                                    onPress={() => setAttendeeData({...attendeeData, gender: g})}
+                                                >
+                                                    <Text style={[styles.genderText, { color: attendeeData.gender === g ? '#fff' : theme.text }]}>{g}</Text>
+                                                </TouchableOpacity>
+                                            ))}
+                                        </View>
+                                    </View>
+                                    
+                                    <TouchableOpacity style={[styles.mainBtn, { marginTop: 20 }]} onPress={handleBooking}>
+                                        <LinearGradient
+                                            colors={[theme.primary, isDarkMode ? '#1E3A8A' : '#4F46E5']}
+                                            start={{ x: 0, y: 0 }}
+                                            end={{ x: 1, y: 0 }}
+                                            style={styles.btnGradient}
+                                        >
+                                            <Text style={styles.btnText}>{isBooking ? "Confirming..." : "Confirm Booking"}</Text>
+                                            {isBooking && <ActivityIndicator size="small" color="#fff" />}
+                                        </LinearGradient>
+                                    </TouchableOpacity>
+                                    <View style={{ height: 20 }} />
+                                </ScrollView>
+                            </View>
+                        </KeyboardAvoidingView>
+                    </Modal>
                 </>
             )}
-
-            {/* <FootBar setPageStack={setPageStack} getPageStack={getPageStack} /> */}
         </SafeAreaView>
     );
 };
 
+export { Event_Details };
+
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
     },
     scroll: {
         flex: 1,
     },
+    stickyHeader: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 10,
+        paddingHorizontal: 20,
+        paddingTop: Platform.OS === 'ios' ? 0 : 20,
+    },
+    headerButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    headerBtn: {
+        width: 45,
+        height: 45,
+        borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     bannerContainer: {
         width: '100%',
-        height: 300,
+        height: 350,
         position: 'relative',
     },
     bannerImage: {
         width: '100%',
         height: '100%',
     },
-    backBtn: {
-        position: 'absolute',
-        top: Platform.OS === 'ios' ? 10 : 20,
-        left: 20,
-        width: 45,
-        height: 45,
-        borderRadius: 23,
-        backgroundColor: 'rgba(255,255,255,0.9)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
+    bannerOverlay: {
+        ...StyleSheet.absoluteFillObject,
     },
     typeBadge: {
         position: 'absolute',
-        bottom: 20,
-        right: 20,
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        paddingHorizontal: 15,
+        bottom: 50,
+        left: 25,
+        paddingHorizontal: 12,
         paddingVertical: 6,
-        borderRadius: 20,
+        borderRadius: 8,
     },
     typeText: {
         color: '#fff',
-        fontWeight: 'bold',
+        fontWeight: '800',
         fontSize: 12,
         textTransform: 'uppercase',
     },
     content: {
-        flex: 1,
-        backgroundColor: '#fff',
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        marginTop: -30,
-        paddingHorizontal: 25,
+        borderTopLeftRadius: 35,
+        borderTopRightRadius: 35,
+        marginTop: -35,
         paddingTop: 30,
+        paddingHorizontal: 25,
     },
-    headerRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
+    titleSection: {
+        marginBottom: 25,
     },
     title: {
-        fontSize: 26,
+        fontSize: 28,
         fontWeight: '900',
-        color: '#1e293b',
-        flex: 1,
-        marginRight: 15,
+        lineHeight: 36,
     },
-    priceTag: {
-        backgroundColor: COLORS.primary,
+    priceRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 15,
+        justifyContent: 'space-between',
+    },
+    priceBadge: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 15,
         paddingVertical: 8,
-        borderRadius: 15,
-        elevation: 3,
+        borderRadius: 12,
     },
     priceText: {
         color: '#fff',
-        fontWeight: 'bold',
+        fontWeight: '800',
         fontSize: 16,
-        marginLeft: 5,
+        marginLeft: 6,
     },
     creatorInfo: {
-        color: '#64748b',
         fontSize: 13,
-        marginTop: 5,
-        marginBottom: 25,
+        fontWeight: '600',
     },
     infoGrid: {
         flexDirection: 'row',
@@ -257,107 +457,155 @@ const styles = StyleSheet.create({
     },
     infoCard: {
         width: '48%',
-        backgroundColor: '#f8fafc',
         padding: 15,
         borderRadius: 20,
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#f1f5f9',
     },
-    infoCardWide: {
+    locationCard: {
         width: '100%',
-        backgroundColor: '#f8fafc',
         padding: 15,
         borderRadius: 20,
         flexDirection: 'row',
         alignItems: 'center',
+        marginBottom: 30,
         borderWidth: 1,
-        borderColor: '#f1f5f9',
-        marginBottom: 25,
     },
     iconCircle: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: 44,
+        height: 44,
+        borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
     },
     infoLabel: {
-        fontSize: 12,
-        color: '#94a3b8',
-        fontWeight: '600',
+        fontSize: 10,
+        fontWeight: '800',
         marginBottom: 2,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
     infoValue: {
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: '700',
-        color: '#334155',
     },
     section: {
-        marginBottom: 25,
+        marginBottom: 30,
     },
     sectionTitle: {
         fontSize: 18,
-        fontWeight: '800',
-        color: '#1e293b',
-        marginBottom: 12,
+        fontWeight: '900',
+        marginBottom: 15,
     },
     aboutText: {
         fontSize: 15,
-        lineHeight: 24,
-        color: '#64748b',
+        lineHeight: 26,
     },
     highlightWrapper: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 10,
+        gap: 12,
     },
     highlightChip: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#f0f9ff',
-        paddingHorizontal: 15,
-        paddingVertical: 8,
-        borderRadius: 12,
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        borderRadius: 14,
         borderWidth: 1,
-        borderColor: '#e0f2fe',
     },
     highlightText: {
         marginLeft: 8,
-        color: '#0369a1',
-        fontWeight: '600',
+        fontWeight: '700',
         fontSize: 13,
     },
-    bottomBar: {
+    bottomAction: {
         position: 'absolute',
-        bottom: 70, // above footer
+        bottom: 0,
         left: 0,
         right: 0,
         paddingHorizontal: 25,
-        paddingBottom: 20,
-        backgroundColor: 'rgba(255,255,255,0.9)',
+        paddingBottom: 30,
+        paddingTop: 20,
     },
-    joinBtn: {
-        backgroundColor: COLORS.primary,
-        width: '100%',
-        paddingVertical: 18,
+    bottomBlur: {
+        position: 'absolute',
+        top: -40,
+        left: 0,
+        right: 0,
+        height: 40,
+    },
+    mainBtn: {
+        height: 60,
         borderRadius: 20,
+        overflow: 'hidden',
+        elevation: 8,
+    },
+    btnGradient: {
+        flex: 1,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 8,
-        shadowColor: COLORS.primary,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
+        gap: 12,
     },
-    joinBtnText: {
+    btnText: {
         color: '#fff',
         fontSize: 18,
-        fontWeight: 'bold',
+        fontWeight: '900',
     },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'flex-end',
+    },
+    modalContent: {
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
+        padding: 25,
+        maxHeight: '80%',
+        borderWidth: 1,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    modalTitle: {
+        fontSize: 22,
+        fontWeight: '800',
+    },
+    inputGroup: {
+        marginBottom: 16,
+    },
+    inputLabel: {
+        fontSize: 14,
+        fontWeight: '600',
+        marginBottom: 8,
+    },
+    input: {
+        borderWidth: 1,
+        borderRadius: 12,
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        fontSize: 16,
+    },
+    genderRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    genderBtn: {
+        flex: 1,
+        borderWidth: 1,
+        borderRadius: 12,
+        paddingVertical: 12,
+        alignItems: 'center',
+        marginHorizontal: 4,
+    },
+    genderText: {
+        fontWeight: '600',
+        fontSize: 14,
+    }
 });
-
-export { Event_Details };

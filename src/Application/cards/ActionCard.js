@@ -1,7 +1,11 @@
+// React component and screen logic for the app.
 import { TextCOLORS,LinearColor } from "../../../public/styles/global";
 import { View,Text,TouchableOpacity,StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Entypo from '@expo/vector-icons/Entypo';
+/**
+ * Action Card.
+ */
 const ActionCard = ({color,title,dis}) => {
     return(
         <LinearGradient
@@ -21,6 +25,7 @@ const ActionCard = ({color,title,dis}) => {
 
 export {ActionCard};
 
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
     createCard:{
         borderWidth:0.5,

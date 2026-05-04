@@ -1,3 +1,4 @@
+// React component and screen logic for the app.
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useState } from 'react';
@@ -8,13 +9,18 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { NavBar } from '../comman_component/navBar';
 import { FootBar } from '../comman_component/footer';
 import { SideBar } from '../comman_component/sideBar';
-import { COLORS } from '../../../public/global';
 import { Read_From_evetndata, Read_From_venderdata } from '../../../private/database/offline/oprations/read';
 import { EventCard } from './sub_compo/EventCard';
 import { VendorCard } from './sub_compo/VendorCard';
 import { decryptData } from '../../../utils/Hash';
 
+import { useTheme } from '../../../context/ThemeContext';
+
+/**
+ * Home Page.
+ */
 const HomePage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack }) => {
+    const { isDarkMode, colors: theme } = useTheme();
 
     const [getSideBar, setSideBar] = useState(false);
     const [getEvents, setEvents] = useState([]);
@@ -22,6 +28,9 @@ const HomePage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack 
     const [getVendors, setVendors] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('All');
 
+    /**
+     * Load Data.
+     */
     const loadData = async () => {
         // Fetch Events
         const eventRes = await Read_From_evetndata(getDB);
@@ -53,6 +62,9 @@ const HomePage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack 
         { name: 'Art', icon: 'palette' },
     ];
 
+    /**
+     * Filter By Category.
+     */
     const filterByCategory = (categoryName) => {
         setSelectedCategory(categoryName);
         if (categoryName === 'All') {
@@ -67,7 +79,7 @@ const HomePage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack 
 
     return (
         <>
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
                 <NavBar setPageStack={setPageStack} getUserData={getUserData} title={'Home'} setSideBar={setSideBar} />
 
                 {getSideBar &&
@@ -76,14 +88,14 @@ const HomePage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack 
 
                 <ScrollView showsVerticalScrollIndicator={false}>
                     {/* Hero Header */}
-                    <View style={styles.header}>
+                    <View style={[styles.header, { backgroundColor: theme.primary }]}>
                         <View style={styles.headerContainer1}>
-                            <Text style={styles.heroTitle}>Create Event And Send Ticket With Just One Click.</Text>
+                            <Text style={[styles.heroTitle, { color: '#ffffff' }]}>Create Event And Send Ticket With Just One Click.</Text>
                             <TouchableOpacity
                                 style={styles.createBtn}
                                 onPress={() => setPageStack(preStack => [...preStack, "createEvent"])}
                             >
-                                <Text style={styles.createBtnText}>Create Event</Text>
+                                <Text style={[styles.createBtnText, { color: theme.primary }]}>Create Event</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -92,7 +104,7 @@ const HomePage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack 
 
                         {/* Categories Section */}
                         <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>Explore Categories</Text>
+                            <Text style={[styles.sectionTitle, { color: theme.text }]}>Explore Categories</Text>
                             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryScroll}>
                                 {categories.map((cat, index) => (
                                     <TouchableOpacity
@@ -105,17 +117,19 @@ const HomePage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack 
                                     >
                                         <View style={[
                                             styles.categoryIconCircle,
-                                            selectedCategory === cat.name && { backgroundColor: COLORS.primary }
+                                            { backgroundColor: theme.card },
+                                            selectedCategory === cat.name && { backgroundColor: theme.primary }
                                         ]}>
                                             <MaterialCommunityIcons
                                                 name={cat.icon}
                                                 size={28}
-                                                color={selectedCategory === cat.name ? '#ffffff' : COLORS.primary}
+                                                color={selectedCategory === cat.name ? '#ffffff' : theme.primary}
                                             />
                                         </View>
                                         <Text style={[
                                             styles.categoryText,
-                                            selectedCategory === cat.name && { color: COLORS.primary, fontWeight: '800' }
+                                            { color: theme.text },
+                                            selectedCategory === cat.name && { color: theme.primary, fontWeight: '800' }
                                         ]}>{cat.name}</Text>
                                     </TouchableOpacity>
                                 ))}
@@ -125,9 +139,9 @@ const HomePage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack 
                         {/* Upcoming Events Section */}
                         <View style={styles.section}>
                             <View style={styles.sectionHeader}>
-                                <Text style={styles.sectionTitle}>Upcoming Events</Text>
+                                <Text style={[styles.sectionTitle, { color: theme.text }]}>Upcoming Events</Text>
                                 <TouchableOpacity onPress={() => setPageStack([...getPageStack, 'event'])}>
-                                    <Text style={styles.viewAll}>View All</Text>
+                                    <Text style={[styles.viewAll, { color: theme.primary }]}>View All</Text>
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.cardList}>
@@ -138,11 +152,11 @@ const HomePage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack 
                                             DATA={event}
                                             getPageStack={getPageStack}
                                             setPageStack={setPageStack}
-                                            color={COLORS.primary}
+                                            color={theme.primary}
                                         />
                                     ))
                                 ) : (
-                                    <Text style={styles.emptyText}>No upcoming events found</Text>
+                                    <Text style={[styles.emptyText, { color: theme.subtext }]}>No upcoming events found</Text>
                                 )}
                             </View>
                         </View>
@@ -150,9 +164,9 @@ const HomePage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack 
                         {/* Featured Vendors Section */}
                         <View style={styles.section}>
                             <View style={styles.sectionHeader}>
-                                <Text style={styles.sectionTitle}>Featured Vendors</Text>
+                                <Text style={[styles.sectionTitle, { color: theme.text }]}>Featured Vendors</Text>
                                 <TouchableOpacity onPress={() => setPageStack([...getPageStack, 'vendor'])}>
-                                    <Text style={styles.viewAll}>View All</Text>
+                                    <Text style={[styles.viewAll, { color: theme.primary }]}>View All</Text>
                                 </TouchableOpacity>
                             </View>
                             <ScrollView
@@ -169,15 +183,15 @@ const HomePage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack 
                                         />
                                     ))
                                 ) : (
-                                    <Text style={styles.emptyText}>Soon top vendors will appear here</Text>
+                                    <Text style={[styles.emptyText, { color: theme.subtext }]}>Soon top vendors will appear here</Text>
                                 )}
                             </ScrollView>
                         </View>
 
                         {/* Why Choose Us info section */}
-                        <View style={styles.infoSection}>
-                            <Text style={styles.infoTitle}>Experience Seamless Events</Text>
-                            <Text style={styles.infoDesc}>Managing events has never been easier. Secure ticketing, vendor management, and offline support - all in one app.</Text>
+                        <View style={[styles.infoSection, { backgroundColor: theme.card, borderColor: theme.border }]}>
+                            <Text style={[styles.infoTitle, { color: theme.primary }]}>Experience Seamless Events</Text>
+                            <Text style={[styles.infoDesc, { color: theme.subtext }]}>Managing events has never been easier. Secure ticketing, vendor management, and offline support - all in one app.</Text>
                         </View>
 
                     </View>
@@ -193,13 +207,12 @@ const HomePage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack 
 
 export { HomePage };
 
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
     },
     header: {
-        backgroundColor: COLORS.primary,
         width: '100%',
         height: 240,
         borderBottomLeftRadius: 35,
@@ -217,7 +230,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     heroTitle: {
-        color: "#ffffff",
         fontWeight: '900',
         fontSize: 24,
         textAlign: 'center',
@@ -232,7 +244,6 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     createBtnText: {
-        color: COLORS.primary,
         fontWeight: 'bold',
         fontSize: 16,
     },
@@ -253,10 +264,8 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontWeight: '800',
         fontSize: 19,
-        color: '#1a1a1a',
     },
     viewAll: {
-        color: COLORS.primary,
         fontWeight: '600',
     },
     categoryScroll: {
@@ -270,7 +279,6 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 30,
-        backgroundColor: '#ffffff',
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 3,
@@ -283,7 +291,6 @@ const styles = StyleSheet.create({
         marginTop: 8,
         fontSize: 13,
         fontWeight: '600',
-        color: '#444',
     },
     categoryItemActive: {
         transform: [{ scale: 1.05 }],
@@ -300,24 +307,20 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
     },
     infoSection: {
-        backgroundColor: '#ffffff',
         marginHorizontal: 15,
         padding: 25,
         borderRadius: 20,
         alignItems: 'center',
         marginTop: 10,
         borderWidth: 1,
-        borderColor: '#eee',
     },
     infoTitle: {
         fontSize: 18,
         fontWeight: '800',
-        color: COLORS.primary,
         marginBottom: 8,
     },
     infoDesc: {
         textAlign: 'center',
-        color: '#666',
         lineHeight: 20,
         fontSize: 14,
     },
@@ -329,7 +332,6 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         textAlign: 'center',
-        color: '#999',
         fontStyle: 'italic',
         marginTop: 10,
     }

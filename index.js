@@ -1,3 +1,4 @@
+// Source module for application logic.
 import './src/polyfills';
 import { registerRootComponent } from 'expo';
 

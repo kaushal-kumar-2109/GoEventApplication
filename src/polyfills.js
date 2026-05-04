@@ -1,3 +1,4 @@
+// React component and screen logic for the app.
 import * as Crypto from "expo-crypto";
 
 /**

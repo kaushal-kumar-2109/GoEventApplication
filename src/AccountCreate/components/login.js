@@ -29,6 +29,9 @@ const verifyPassword = async (plain, hash) => {
     return await bcrypt.compare(first, hash);
 };
 
+/**
+ * Login Page.
+ */
 const LoginPage = ({ setPageStack, getUserData, setUserData }) => {
 
     const [getLoader, setLoader] = useState(false);
@@ -205,6 +208,7 @@ const LoginPage = ({ setPageStack, getUserData, setUserData }) => {
 
 export { LoginPage };
 
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
     container: {
         paddingTop: '10%',

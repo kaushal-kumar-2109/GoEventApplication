@@ -12,6 +12,9 @@ import { useState } from "react";
 import { COLORS, FONTS } from "../../../public/global";
 import { Read_From_Online_userdata } from "../../../private/database/online/oprations/read";
 
+/**
+ * For Got Password.
+ */
 const ForGotPassword = ({ getUserData, setUserData, setForgotPassword, setPageStack }) => {
 
     // other variables
@@ -181,6 +184,7 @@ const ForGotPassword = ({ getUserData, setUserData, setForgotPassword, setPageSt
 
 export { ForGotPassword };
 
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
     container: {
         paddingTop: '10%',

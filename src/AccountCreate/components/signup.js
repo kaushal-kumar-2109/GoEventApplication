@@ -12,6 +12,9 @@ import { useState } from "react";
 import { COLORS, FONTS } from "../../../public/global";
 import { Read_From_Online_userdata } from "../../../private/database/online/oprations/read";
 
+/**
+ * Signup Page.
+ */
 const SignupPage = ({ setPageStack, getUserData, setUserData }) => {
 
     // othet assets variables
@@ -181,6 +184,7 @@ const SignupPage = ({ setPageStack, getUserData, setUserData }) => {
 
 export { SignupPage };
 
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
     container: {
         paddingTop: '10%',

@@ -1,140 +1,256 @@
-import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
-import EvilIcons from '@expo/vector-icons/EvilIcons';
-import Feather from '@expo/vector-icons/Feather';
+// React component and screen logic for the app.
+import { View, Image, StyleSheet, Text, TouchableOpacity, Modal, TouchableWithoutFeedback, Dimensions } from "react-native";
+import { Ionicons, Feather, MaterialIcons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { Alert } from "react-native";
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useState } from "react";
 
 import { Delete_EventData } from "../../../../private/database/offline/oprations/delete";
 import { COLORS } from "../../../../public/global";
-import { useState } from "react";
 import { decryptData } from "../../../../utils/Hash";
 
+const { width } = Dimensions.get('window');
+
+/**
+ * Event Card.
+ */
 const EventCard = ({ getDB, DATA, color, getPageStack, setPageStack }) => {
 
     const [getMenu, setMenu] = useState(false);
 
-    return (
-        <TouchableOpacity style={[Style.Card]}>
+    /**
+     * Toggles  menu in application state.
+     */
+    const toggleMenu = () => setMenu(!getMenu);
 
-            <View style={[{ width: "90%", alignSelf: 'center', top: -60 }]}>
-                {/* here you need to add your image url */}
-                <Image source={{ uri: `${decryptData(DATA.EVENT_BANNER)}` }} style={[Style.CardImage]}></Image>
-            </View>
-
-            <View style={[{ top: -50 }]}>
-                <Text style={[{ fontWeight: 800, fontSize: 20, color: '#686666ff' }]} numberOfLines={1} ellipsizeMode="tail">{decryptData(DATA.EVENT_NAME)}</Text>
-                <View style={[Style.DetailDiv]}>
-                    <EvilIcons name="calendar" size={24} color="#686666ff" />
-                    <Text style={[Style.Detail]} numberOfLines={1} ellipsizeMode="tail">{decryptData(DATA.EVENT_DATE)}</Text>
-                </View>
-                <View style={[Style.DetailDiv, { marginLeft: 5 }]}>
-                    <Feather name="clock" size={18} color="#686666ff" />
-                    <Text style={[Style.Detail]} numberOfLines={1} ellipsizeMode="tail">{decryptData(DATA.EVENT_TIME)}</Text>
-                </View>
-                <View style={[Style.DetailDiv]}>
-                    <EvilIcons name="location" size={24} color="#686666ff" />
-                    <Text style={[Style.Detail]} numberOfLines={1} ellipsizeMode="tail">{decryptData(DATA.EVENT_LOCATION)}</Text>
-                </View>
-                <View style={[{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, alignItems: 'center' }]}>
-                    <TouchableOpacity onPress={() => setMenu(!getMenu)} style={[{ height: 30, width: 30, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }]}>
-                        <MaterialIcons name="details" size={24} color="rgb(29, 141, 233)" />
-                    </TouchableOpacity>
-                    {/* menu  */}
-                    {getMenu &&
-                        <View
-                            style={[{ position: 'absolute', height: "auto", width: "90%", backgroundColor: '#c4c1c1', borderRadius: 3, left: 30, bottom: 0, zIndex: 10, padding: 5 }]}
-                        >
-                            <TouchableOpacity
-                                onPress={() => setPageStack(preStack => [...preStack, `scan.${DATA.EVENT_ID}`])}
-                                style={[{ backgroundColor: "white", margin: 2, padding: 5, borderRadius: 3 }]}>
-                                <Text>Scan</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                onPress={() => setPageStack(preStack => [...preStack, `invite.${DATA.EVENT_ID}`])}
-                                style={[{ backgroundColor: "white", margin: 2, padding: 5, borderRadius: 3 }]}>
-                                <Text>Invite</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                onPress={() => setPageStack(preStack => [...preStack, `eventDetails.${DATA.EVENT_ID}`])}
-                                style={[{ backgroundColor: "white", margin: 2, padding: 5, borderRadius: 3 }]}>
-                                <Text>Details</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                // onPress={()=>setPageStack(preStack => [...preStack, `eventDetails.${DATA.ID}` ])}
-                                onPress={() => {
-                                    Alert.alert(
-                                        "Delete Event",              // Title
-                                        "Do you want to delete?",   // Message
-                                        [
-                                            {
-                                                text: "No",
-                                                onPress: () => console.log(0),
-                                                style: "cancel"
-                                            },
-                                            {
-                                                text: "Yes",
-                                                onPress: async () => {
-                                                    const res = await Delete_EventData(getDB, DATA.USER_ID, DATA.EVENT_ID);
-                                                }
-                                            }
-                                        ],
-                                        { cancelable: true }
-                                    );
-
-                                }}
-
-                                style={[{ backgroundColor: "white", margin: 2, padding: 5, borderRadius: 3 }]}>
-                                <Text>Delete</Text>
-                            </TouchableOpacity>
-
-                        </View>
+    /**
+     * Handles  delete logic for the application.
+     */
+    const handleDelete = () => {
+        setMenu(false);
+        Alert.alert(
+            "Delete Event",
+            "Are you sure you want to delete this event? This action cannot be undone.",
+            [
+                { text: "Cancel", style: "cancel" },
+                { 
+                    text: "Delete", 
+                    style: "destructive",
+                    onPress: async () => {
+                        const res = await Delete_EventData(getDB, DATA.USER_ID, DATA.EVENT_ID);
+                        // Optional: trigger a refresh in parent if needed
                     }
+                }
+            ]
+        );
+    };
 
-                    <TouchableOpacity style={[{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10, backgroundColor: COLORS.primary, borderColor: '#9a9898ff', borderWidth: 1 }]}>
-                        <FontAwesome5 name="rupee-sign" size={12} color="#ffffff" />
-                        <Text style={[{ color: '#ffffff', marginLeft: 5 }]}>
+    /**
+     * Navigate To.
+     */
+    const navigateTo = (route) => {
+        setMenu(false);
+        setPageStack(prev => [...prev, `${route}.${DATA.EVENT_ID}`]);
+    };
+
+    return (
+        <View style={styles.cardContainer}>
+            <TouchableOpacity 
+                activeOpacity={0.9} 
+                style={styles.card}
+                onPress={() => navigateTo('eventDetails')}
+            >
+                {/* Banner Image */}
+                <View style={styles.imageContainer}>
+                    <Image 
+                        source={{ uri: `${decryptData(DATA.EVENT_BANNER)}` }} 
+                        style={styles.cardImage}
+                        resizeMode="cover"
+                    />
+                    <View style={styles.priceBadge}>
+                        <FontAwesome5 name="rupee-sign" size={10} color="#ffffff" />
+                        <Text style={styles.priceText}>
                             {decryptData(DATA.EVENT_AMOUNT) === '0' ? "Free" : decryptData(DATA.EVENT_AMOUNT)}
                         </Text>
-                    </TouchableOpacity>
+                    </View>
                 </View>
-            </View>
 
-        </TouchableOpacity>
-    )
+                {/* Content */}
+                <View style={styles.contentContainer}>
+                    <View style={styles.headerRow}>
+                        <Text style={styles.eventName} numberOfLines={1}>
+                            {decryptData(DATA.EVENT_NAME)}
+                        </Text>
+                        <TouchableOpacity onPress={toggleMenu} style={styles.menuTrigger}>
+                            <Ionicons name="ellipsis-vertical" size={20} color={COLORS.subtext} />
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.detailRow}>
+                        <Ionicons name="calendar-outline" size={16} color={COLORS.primary} />
+                        <Text style={styles.detailText}>{decryptData(DATA.EVENT_DATE)}</Text>
+                    </View>
+
+                    <View style={styles.detailRow}>
+                        <Feather name="clock" size={14} color={COLORS.primary} />
+                        <Text style={styles.detailText}>{decryptData(DATA.EVENT_TIME)}</Text>
+                    </View>
+
+                    <View style={styles.detailRow}>
+                        <Ionicons name="location-outline" size={16} color={COLORS.primary} />
+                        <Text style={styles.detailText} numberOfLines={1}>{decryptData(DATA.EVENT_LOCATION)}</Text>
+                    </View>
+                </View>
+            </TouchableOpacity>
+
+            {/* Professional Options Menu */}
+            {getMenu && (
+                <>
+                    <TouchableWithoutFeedback onPress={() => setMenu(false)}>
+                        <View style={styles.menuOverlay} />
+                    </TouchableWithoutFeedback>
+                    <View style={styles.menuPopup}>
+                        <TouchableOpacity style={styles.menuItem} onPress={() => navigateTo('scan')}>
+                            <MaterialCommunityIcons name="qrcode-scan" size={20} color={COLORS.text} />
+                            <Text style={styles.menuItemText}>Scan QR</Text>
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity style={styles.menuItem} onPress={() => navigateTo('invite')}>
+                            <Ionicons name="person-add-outline" size={20} color={COLORS.text} />
+                            <Text style={styles.menuItemText}>Invite Members</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.menuItem} onPress={() => navigateTo('eventDetails')}>
+                            <Ionicons name="information-circle-outline" size={20} color={COLORS.text} />
+                            <Text style={styles.menuItemText}>View Details</Text>
+                        </TouchableOpacity>
+
+                        <View style={styles.menuDivider} />
+
+                        <TouchableOpacity style={[styles.menuItem]} onPress={handleDelete}>
+                            <Ionicons name="trash-outline" size={20} color={COLORS.error} />
+                            <Text style={[styles.menuItemText, { color: COLORS.error }]}>Delete Event</Text>
+                        </TouchableOpacity>
+                    </View>
+                </>
+            )}
+        </View>
+    );
 }
 
 export { EventCard };
 
-const Style = StyleSheet.create({
-    Card: {
-        width: 280,
-        height: 250,
-        borderWidth: 3,
-        borderColor: '#cfc8c84d',
-        borderRadius: 10,
-        marginVertical: 60,
-        padding: 10,
-        marginHorizontal: 10
+// Style definitions for the styles component.
+const styles = StyleSheet.create({
+    cardContainer: {
+        marginHorizontal: 12,
+        marginVertical: 10,
+        position: 'relative',
     },
-    CardImage: {
-        height: 120,
+    card: {
+        width: 260,
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        overflow: 'hidden',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 5,
+    },
+    imageContainer: {
         width: '100%',
-        borderRadius: 10
+        height: 140,
+        position: 'relative',
     },
-    DetailDiv: {
-        display: 'flex',
+    cardImage: {
+        width: '100%',
+        height: '100%',
+    },
+    priceBadge: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        backgroundColor: 'rgba(0,0,0,0.6)',
         flexDirection: 'row',
-        marginTop: 5,
         alignItems: 'center',
-        paddingHorizontal: 5
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
     },
-    Detail: {
-        fontWeight: 600,
-        color: '#686666ff',
-        marginLeft: 5
+    priceText: {
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: '700',
+        marginLeft: 4,
+    },
+    contentContainer: {
+        padding: 12,
+    },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    eventName: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: COLORS.text,
+        flex: 1,
+    },
+    menuTrigger: {
+        padding: 4,
+    },
+    detailRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 6,
+    },
+    detailText: {
+        fontSize: 13,
+        color: COLORS.subtext,
+        marginLeft: 8,
+        fontWeight: '500',
+    },
+    menuOverlay: {
+        position: 'absolute',
+        top: -500,
+        left: -500,
+        right: -500,
+        bottom: -500,
+        zIndex: 9,
+    },
+    menuPopup: {
+        position: 'absolute',
+        top: 40,
+        right: 10,
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        width: 180,
+        padding: 8,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.2,
+        shadowRadius: 15,
+        elevation: 10,
+        zIndex: 10,
+    },
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+    },
+    menuItemText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: COLORS.text,
+        marginLeft: 12,
+    },
+    menuDivider: {
+        height: 1,
+        backgroundColor: '#F1F5F9',
+        marginVertical: 4,
     }
-})
+});

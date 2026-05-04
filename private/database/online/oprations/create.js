@@ -1,3 +1,4 @@
+// Online database communication helpers.
 import { SUP_BASE } from "../connect";
 import * as Crypto from "expo-crypto";
 import bcrypt from "bcryptjs"; // make sure to install bcryptjs in your project
@@ -40,6 +41,9 @@ const hashPassword = async (password) => {
   return await bcrypt.hash(sha, salt);
 };
 
+/**
+ * Creates user online in the application data store.
+ */
 const Create_User_Online = async (udata) => {
   // extract raw values
   const rawEmail = udata[1][0];
@@ -92,6 +96,9 @@ const Create_User_Online = async (udata) => {
   }
 };
 
+/**
+ * Creates event online in the application data store.
+ */
 const Create_Event_Online = async (udata) => {
 
   const EVENT_ID = udata[0];
@@ -142,6 +149,9 @@ const Create_Event_Online = async (udata) => {
   }
 };
 
+/**
+ * Creates event invite online in the application data store.
+ */
 const Create_Event_Invite_Online = async (DATA) => {
   const USER_ID = DATA[1];
   const { data, error } = await SUP_BASE
@@ -167,6 +177,9 @@ const Create_Event_Invite_Online = async (DATA) => {
   }
 }
 
+/**
+ * Creates app log online in the application data store.
+ */
 const Create_App_Log_Online = async (logData) => {
   const { data, error } = await SUP_BASE
     .from("APP_LOGS")
@@ -188,9 +201,63 @@ const Create_App_Log_Online = async (logData) => {
   return { STATUS: 200 };
 }
 
-export { Create_User_Online, random_USER, Create_Event_Online, random_EVENT, Create_Event_Invite_Online, Create_App_Log_Online };
+/**
+ * Creates booking online in the application data store.
+ */
+const Create_Booking_Online = async (bookingData) => {
+  const { data, error } = await SUP_BASE
+    .from("BOOKINGS")
+    .insert([
+      {
+        BOOKING_ID: bookingData.BOOKING_ID,
+        USER_ID: bookingData.USER_ID,
+        EVENT_ID: bookingData.EVENT_ID,
+        ATTENDEE_NAME: bookingData.ATTENDEE_NAME,
+        ATTENDEE_EMAIL: bookingData.ATTENDEE_EMAIL,
+        ATTENDEE_NUMBER: bookingData.ATTENDEE_NUMBER,
+        ATTENDEE_GENDER: bookingData.ATTENDEE_GENDER,
+        BOOKING_TIME: bookingData.BOOKING_TIME,
+        STATUS: bookingData.STATUS
+      },
+    ]);
+
+  if (error) {
+    console.log("Online Booking Error:", error);
+    return { STATUS: 500, ERROR: error };
+  }
+  return { STATUS: 200 };
+}
+
+/**
+ * Creates notification online in the application data store.
+ */
+const Create_Notification_Online = async (notifData) => {
+  const { data, error } = await SUP_BASE
+    .from("NOTIFICATIONS")
+    .insert([
+      {
+        NOTIFICATION_ID: notifData.NOTIFICATION_ID,
+        USER_ID: notifData.USER_ID,
+        TITLE: notifData.TITLE,
+        MESSAGE: notifData.MESSAGE,
+        TIME: notifData.TIME,
+        STATUS: notifData.STATUS
+      },
+    ]);
+
+  if (error) {
+    console.log("Online Notification Error:", error);
+    return { STATUS: 500, ERROR: error };
+  }
+  return { STATUS: 200 };
+}
+
+export { Create_User_Online, random_USER, Create_Event_Online, random_EVENT, Create_Event_Invite_Online, Create_App_Log_Online, Create_Booking_Online, Create_Notification_Online };
 
 
+/**
+ * Generates a new unique identifier string for database records or logs.
+ */
 const Create_Id = () => {
   const serial = "1234567890qwertyuioplkjhgfdsazxcvbnmMNBVCXZASDFGHJKLPOIUYTREWQ";
   let id = "";
@@ -203,6 +270,9 @@ const Create_Id = () => {
   return id;
 };
 
+/**
+ * Generates a new event code string for offline event creation.
+ */
 function Create_Code() {
   return Math.floor(1000000000 + Math.random() * 9000000000);
 }
@@ -218,6 +288,9 @@ const users = [
   ['Rohan Mehta', 'rohan.mehta07@gmail.com', 'rohan@123', '9811122233', 'https://randomuser.me/api/portraits/men/17.jpg'],
   ['Neha Kapoor', 'neha.kapoor08@gmail.com', 'neha@123', '9890012345', 'https://randomuser.me/api/portraits/women/18.jpg']
 ];
+/**
+ * Random USER.
+ */
 const random_USER = async () => {
   for (let i = 0; i < users.length; i++) {
     let u = await Create_User_Online(users[i]);
@@ -246,6 +319,9 @@ const events = [
   ['QHfKQMgC6o9EwAXjIZFTOc2iG', 'Night Food Market', '2026-05-30', '199', 'Karol Bagh Market', '09:00 PM', 'Late night food and music experience', 'food,music,night,fun', 'PUBLIC', '2026-03-14T12:18:00.000Z', 'https://picsum.photos/seed/event19/800/400', 'EVT019', true],
   ['y567MQ3bP4vjTr8yZJillPhp2', 'Summer Pool Party', '2026-06-02', '699', 'Delhi Resort Pool', '04:00 PM', 'Poolside DJ party with drinks and dance', 'poolparty,music,dance,summer', 'PRIVATE', '2026-03-14T12:19:00.000Z', 'https://picsum.photos/seed/event20/800/400', 'EVT020', true],
 ]
+/**
+ * Random EVENT.
+ */
 const random_EVENT = async () => {
   for (let i = 0; i < events.length; i++) {
     let u = await Create_Event_Online(events[i]);

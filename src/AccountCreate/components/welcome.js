@@ -1,3 +1,4 @@
+// React component and screen logic for the app.
 import React, { useState, useEffect } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,6 +14,9 @@ const IMAGE_SOURCES = [
   require("../../../assets/w5.jpg"),
 ];
 
+/**
+ * Renders the welcome screen UI screen.
+ */
 const WelcomeScreen = ({ setPageStack }) => {
   const [ready, setReady] = useState(false);
 
@@ -82,6 +86,7 @@ const WelcomeScreen = ({ setPageStack }) => {
 
 export { WelcomeScreen };
 
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
   container: {
     flex: 1,

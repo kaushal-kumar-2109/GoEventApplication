@@ -1,8 +1,12 @@
+// React component and screen logic for the app.
 import { View,Image, StyleSheet,Text, TouchableOpacity } from "react-native";
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
+/**
+ * Vendor Card.
+ */
 const VendorCard = ({DATA,color}) => {
 
     return(
@@ -56,6 +60,7 @@ const VendorCard = ({DATA,color}) => {
 
 export {VendorCard};
 
+// Style definitions for the style component.
 const Style= StyleSheet.create({
     Card:{
         width:280,

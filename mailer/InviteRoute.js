@@ -1,7 +1,11 @@
+// Mailer API calls and route definitions.
 import { APIs } from "./routers";
 import { initDB } from "../private/database/offline/connect";
 import { Create_Event_Invite_Offline } from "../private/database/offline/oprations/create";
 
+/**
+ * Invite User By Email.
+ */
 const Invite_User_By_Email = async (DB, data, eventData) => {
   try {
     const response = await fetch(`${APIs.sendInvitation}`, {

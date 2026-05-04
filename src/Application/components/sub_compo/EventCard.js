@@ -1,17 +1,22 @@
+// React component and screen logic for the app.
 import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import Feather from '@expo/vector-icons/Feather';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
-import { COLORS } from "../../../../public/global";
 import { encryptData, decryptData } from "../../../../utils/Hash";
+import { useTheme } from "../../../../context/ThemeContext";
 
+/**
+ * Event Card.
+ */
 const EventCard = ({ DATA, color, getPageStack, setPageStack }) => {
+    const { colors: theme } = useTheme();
 
     return (
         <TouchableOpacity
             onPress={() => setPageStack([...getPageStack, `eventDetails.${DATA.EVENT_ID}`])}
-            style={Style.Card}>
+            style={[Style.Card, { backgroundColor: theme.card, borderColor: theme.border }]}>
 
             <View style={Style.ImageContainer}>
                 <Image
@@ -19,7 +24,7 @@ const EventCard = ({ DATA, color, getPageStack, setPageStack }) => {
                     style={Style.CardImage}
                     resizeMode="cover"
                 />
-                <View style={Style.PriceBadge}>
+                <View style={[Style.PriceBadge, { backgroundColor: theme.primary }]}>
                     <FontAwesome5 name="rupee-sign" size={10} color="#ffffff" />
                     <Text style={Style.PriceText}>
                         {decryptData(DATA.EVENT_AMOUNT) === '0' ? "Free" : decryptData(DATA.EVENT_AMOUNT)}
@@ -28,36 +33,36 @@ const EventCard = ({ DATA, color, getPageStack, setPageStack }) => {
             </View>
 
             <View style={Style.Content}>
-                <Text style={Style.Title} numberOfLines={1} ellipsizeMode="tail">
+                <Text style={[Style.Title, { color: theme.text }]} numberOfLines={1} ellipsizeMode="tail">
                     {decryptData(DATA.EVENT_NAME)}
                 </Text>
 
                 <View style={Style.DetailRow}>
                     <View style={Style.DetailItem}>
-                        <EvilIcons name="calendar" size={20} color={COLORS.subtext} />
-                        <Text style={Style.DetailText} numberOfLines={1}>{decryptData(DATA.EVENT_DATE)}</Text>
+                        <EvilIcons name="calendar" size={20} color={theme.subtext} />
+                        <Text style={[Style.DetailText, { color: theme.subtext }]} numberOfLines={1}>{decryptData(DATA.EVENT_DATE)}</Text>
                     </View>
                     <View style={Style.DetailItem}>
-                        <Feather name="clock" size={14} color={COLORS.subtext} />
-                        <Text style={Style.DetailText} numberOfLines={1}>{decryptData(DATA.EVENT_TIME)}</Text>
+                        <Feather name="clock" size={14} color={theme.subtext} />
+                        <Text style={[Style.DetailText, { color: theme.subtext }]} numberOfLines={1}>{decryptData(DATA.EVENT_TIME)}</Text>
                     </View>
                 </View>
 
                 <View style={Style.LocationRow}>
-                    <EvilIcons name="location" size={20} color={COLORS.subtext} />
-                    <Text style={Style.DetailText} numberOfLines={1} ellipsizeMode="tail">{decryptData(DATA.EVENT_LOCATION)}</Text>
+                    <EvilIcons name="location" size={20} color={theme.subtext} />
+                    <Text style={[Style.DetailText, { color: theme.subtext }]} numberOfLines={1} ellipsizeMode="tail">{decryptData(DATA.EVENT_LOCATION)}</Text>
                 </View>
 
-                <View style={Style.Footer}>
+                <View style={[Style.Footer, { borderTopColor: theme.border }]}>
                     <TouchableOpacity
                         onPress={() => typeof saveToBookMark === 'function' && saveToBookMark(DATA.id, DATA.UserId)}
                         style={Style.BookmarkBtn}
                     >
-                        <FontAwesome5 name="bookmark" size={16} color={color || COLORS.primary} />
+                        <FontAwesome5 name="bookmark" size={16} color={color || theme.primary} />
                     </TouchableOpacity>
 
-                    <View style={Style.CategoryBadge}>
-                        <Text style={Style.CategoryText}>{decryptData(DATA.EVENT_HIGHLIGHT)}</Text>
+                    <View style={[Style.CategoryBadge, { backgroundColor: theme.primary + '20' }]}>
+                        <Text style={[Style.CategoryText, { color: theme.primary }]}>{decryptData(DATA.EVENT_HIGHLIGHT)}</Text>
                     </View>
                 </View>
             </View>
@@ -68,10 +73,10 @@ const EventCard = ({ DATA, color, getPageStack, setPageStack }) => {
 
 export { EventCard };
 
+// Style definitions for the style component.
 const Style = StyleSheet.create({
     Card: {
         width: 250,
-        backgroundColor: '#ffffff',
         borderRadius: 15,
         marginBottom: 20,
         overflow: 'hidden',
@@ -81,7 +86,6 @@ const Style = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         borderWidth: 1,
-        borderColor: '#f0f0f0',
     },
     ImageContainer: {
         width: '100%',
@@ -96,7 +100,6 @@ const Style = StyleSheet.create({
         position: 'absolute',
         top: 10,
         right: 10,
-        backgroundColor: COLORS.primary,
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 8,
@@ -115,7 +118,6 @@ const Style = StyleSheet.create({
     Title: {
         fontWeight: 'bold',
         fontSize: 16,
-        color: '#333',
         marginBottom: 8,
     },
     DetailRow: {
@@ -134,7 +136,6 @@ const Style = StyleSheet.create({
     },
     DetailText: {
         fontSize: 11,
-        color: COLORS.subtext,
         marginLeft: 2,
     },
     Footer: {
@@ -143,21 +144,18 @@ const Style = StyleSheet.create({
         alignItems: 'center',
         marginTop: 5,
         borderTopWidth: 1,
-        borderTopColor: '#f5f5f5',
         paddingTop: 8,
     },
     BookmarkBtn: {
         padding: 4,
     },
     CategoryBadge: {
-        backgroundColor: '#f0f7ff',
         paddingHorizontal: 8,
         paddingVertical: 2,
         borderRadius: 6,
     },
     CategoryText: {
         fontSize: 10,
-        color: COLORS.primary,
         fontWeight: '600',
     }
 });

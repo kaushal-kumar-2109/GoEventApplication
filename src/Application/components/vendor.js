@@ -1,3 +1,4 @@
+// React component and screen logic for the app.
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useState } from 'react';
@@ -12,6 +13,8 @@ import { VendorCard } from './sub_compo/VendorCard';
 import { Read_From_venderdata } from '../../../private/database/offline/oprations/read';
 
 
+import { useTheme } from '../../../context/ThemeContext';
+
 const VendorPage = ({
     getDB,
     getUserData,
@@ -19,6 +22,7 @@ const VendorPage = ({
     setPageStack,
     getPageStack
 }) => {
+    const { colors: theme } = useTheme();
 
     const [getSideBar, setSideBar] = useState(false);
 
@@ -76,9 +80,9 @@ const VendorPage = ({
     }, [getSearchValue, vendorData]);
 
     return (<>
-        <SafeAreaView style={[{ justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%', backgroundColor: "#ffffff", }]}>
+        <SafeAreaView style={[{ justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%', backgroundColor: theme.background }]}>
             <View style={[{ justifyContent: 'center', alignItems: 'center' }]}>
-                <Text style={[{ fontSize: 20, fontWeight: 'bold', color: '#597ef7ff' }]}>COMMING SOON...</Text>
+                <Text style={[{ fontSize: 20, fontWeight: 'bold', color: theme.primary }]}>COMMING SOON...</Text>
             </View>
         </SafeAreaView>
     </>)
@@ -90,6 +94,7 @@ export { VendorPage };
 
 
 
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
 
     container: {

@@ -9,6 +9,9 @@ import { SignupPage } from "./components/signup";
 import { Verification } from "./components/varification";
 import { LoginPage } from "./components/login";
 
+/**
+ * Account Create Collector.
+ */
 const Account_Create_Collector = ({ getDB, CheckUser }) => {
     
     const [getPageStack, setPageStack] = useState(["setCountry"]);

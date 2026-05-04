@@ -1,3 +1,4 @@
+// Online database communication helpers.
 import { SUP_BASE } from "../connect";
 import * as Crypto from "expo-crypto";
 import bcrypt from "bcryptjs";

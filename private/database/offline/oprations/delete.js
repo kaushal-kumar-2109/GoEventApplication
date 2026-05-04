@@ -1,9 +1,13 @@
+// Local offline SQLite database helpers.
 import { initDB } from "../connect";
 import { CheckInternet } from "../../../../utils/checkNetwork";
 import { Delete_Event_Online } from "../../online/oprations/delete";
 import * as SQLite from "expo-sqlite";
 import { Write_App_Log } from "./app_logs";
 
+/**
+ * Deletes userdata from the database or local store.
+ */
 const Delete_Userdata = async (DB, USER_ID) => {
     if (!DB) {
         DB = await initDB();
@@ -19,6 +23,9 @@ const Delete_Userdata = async (DB, USER_ID) => {
     }
 }
 
+/**
+ * Deletes eventdata from the database or local store.
+ */
 const Delete_EventData = async (DB, UID, EID) => {
     if (!DB) {
         DB = await initDB();
@@ -28,21 +35,29 @@ const Delete_EventData = async (DB, UID, EID) => {
         let res = await DB.runAsync("DELETE FROM EVENT_DATA WHERE EVENT_ID = ?", [EID]);
         await Write_App_Log(DB, UID, "INFO", "Event Deleted Offline", `ID: ${EID}`);
 
-        if (CheckInternet()) {
-            const on_res = await Delete_Event_Online(UID, EID);
-            if (on_res.STATUS != 200) {
+        try {
+            if (CheckInternet()) {
+                const on_res = await Delete_Event_Online(UID, EID);
+                if (on_res.STATUS != 200) {
+                    await DB.runAsync(
+                        "INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)",
+                        [Create_Id(), 'EVENT_DATA', EID, 'delete']
+                    );
+                    await Write_App_Log(DB, UID, "WARN", "Online Deletion Failed", `Pending sync for ${EID}`);
+                }
+            } else {
                 await DB.runAsync(
                     "INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)",
                     [Create_Id(), 'EVENT_DATA', EID, 'delete']
                 );
-                await Write_App_Log(DB, UID, "WARN", "Online Deletion Failed", `Pending sync for ${EID}`);
+                await Write_App_Log(DB, UID, "INFO", "Offline Deletion Logged", `Pending sync for ${EID}`);
             }
-        } else {
+        } catch (onlineErr) {
+            console.log("Online deletion failed, logging for sync:", onlineErr.message);
             await DB.runAsync(
                 "INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)",
                 [Create_Id(), 'EVENT_DATA', EID, 'delete']
             );
-            await Write_App_Log(DB, UID, "INFO", "Offline Deletion Logged", `Pending sync for ${EID}`);
         }
 
         if (res) {
@@ -58,6 +73,9 @@ const Delete_EventData = async (DB, UID, EID) => {
 
 export { Delete_Userdata, Delete_EventData };
 
+/**
+ * Generates a new unique identifier string for database records or logs.
+ */
 const Create_Id = () => {
     const serial = "1234567890qwertyuioplkjhgfdsazxcvbnmMNBVCXZASDFGHJKLPOIUYTREWQ";
     let id = "";

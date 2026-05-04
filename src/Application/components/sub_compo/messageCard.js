@@ -1,43 +1,92 @@
-import { TextCOLORS} from "../../../../public/global";
-import { Text,StyleSheet } from "react-native";
+// React component and screen logic for the app.
+import { useTheme } from "../../../../context/ThemeContext";
+import { Text, StyleSheet, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
-const MessageCard = ({setPageStack,color,title,dis,count}) => {
-    return(
+/**
+ * Message Card.
+ */
+const MessageCard = ({ setPageStack, color, title, dis, count }) => {
+    const { colors: theme, isDarkMode } = useTheme();
+    return (
         <TouchableOpacity
-        onPress={()=>setPageStack(preStack => [...preStack, "createEvent" ] )}
+            activeOpacity={0.8}
+            onPress={() => setPageStack(preStack => [...preStack, "createEvent"])}
         >
-        <LinearGradient
-                colors={color} // gradient colors
+            <LinearGradient
+                colors={color}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                style={[styles.createCard,{justifyContent:'center'}]}
+                style={styles.createCard}
             >
-            
-            <Text style={[TextCOLORS.background,{textAlign:'center',fontWeight:800,fontSize:18}]}>{title}</Text>
-            <Text style={[TextCOLORS.background,{textAlign:'center',marginLeft:5,fontWeight:600,fontSize:12}]}>{dis}</Text>
-            <Text style={[TextCOLORS.background,{textAlign:'center',marginLeft:5,fontWeight:600,fontSize:12}]}>{count}</Text>
-            {/* <View style={[{width:"100%",alignItems:'flex-end',marginTop:20}]}>
-                <Entypo name="arrow-with-circle-right" size={24} color={'#ffffff'} />
-            </View> */}
-            
-        </LinearGradient>
+                <View style={styles.iconContainer}>
+                    <Ionicons name="add-circle-outline" size={28} color="white" />
+                </View>
+                
+                <View style={styles.textContainer}>
+                    <Text style={styles.titleText}>{title}</Text>
+                    <Text style={styles.disText}>{dis}</Text>
+                    {count !== "" && <Text style={styles.countText}>{count}</Text>}
+                </View>
+
+                <View style={styles.arrowContainer}>
+                    <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.6)" />
+                </View>
+            </LinearGradient>
         </TouchableOpacity>
     )
 }
 
-export {MessageCard};
+export { MessageCard };
 
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
-    createCard:{
-        borderWidth:0.5,
-        borderColor:'#8e8d8dff',
-        height:100,
-        width:200,
-        borderRadius:6,
-        padding:5,
-        elevation:1,
-        marginHorizontal:10
+    createCard: {
+        height: 120,
+        width: 220,
+        borderRadius: 20,
+        padding: 15,
+        marginHorizontal: 10,
+        flexDirection: 'row',
+        alignItems: 'center',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 6,
+    },
+    iconContainer: {
+        width: 45,
+        height: 45,
+        borderRadius: 12,
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    textContainer: {
+        flex: 1,
+    },
+    titleText: {
+        color: '#fff',
+        fontWeight: '800',
+        fontSize: 16,
+        marginBottom: 2,
+    },
+    disText: {
+        color: 'rgba(255,255,255,0.8)',
+        fontWeight: '600',
+        fontSize: 11,
+    },
+    countText: {
+        color: '#fff',
+        fontWeight: '700',
+        fontSize: 12,
+        marginTop: 4,
+    },
+    arrowContainer: {
+        marginLeft: 5,
     }
 });

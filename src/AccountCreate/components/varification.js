@@ -1,3 +1,4 @@
+// React component and screen logic for the app.
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -10,7 +11,11 @@ import { SendEmail } from "../../../mailer/sendMail";
 import { Create_User } from "../../../private/database/offline/oprations/create";
 import { Create_User_Online } from "../../../private/database/online/oprations/create";
 import { Update_User_Data_Online } from "../../../private/database/online/oprations/update";
+import { Sync_All_User_Data_On_Login } from "../../../private/sync/read_online";
 
+/**
+ * Verification.
+ */
 const Verification = ({ getDB, setPageStack, getPageStak, getUserData, setUserData, CheckUser }) => {
 
   const [getLoader, setLoader] = useState(false);
@@ -57,6 +62,9 @@ const Verification = ({ getDB, setPageStack, getPageStak, getUserData, setUserDa
     inputRefs.current[0].focus();
   };
 
+  /**
+   * Setup User.
+   */
   const setupUser = async () => {
     setCodeErr(false);
     let inputCode = 0;
@@ -81,6 +89,7 @@ const Verification = ({ getDB, setPageStack, getPageStak, getUserData, setUserDa
         const user = await Create_User(getDB, getUserData[0].USER_ID, getUserData, "login", "");
         if (user.STATUS == 200) {
           console.log('data save! ✅');
+          await Sync_All_User_Data_On_Login(getDB, getUserData[0].USER_ID);
           setLoader(false);
           await CheckUser();
         } else {
@@ -97,6 +106,7 @@ const Verification = ({ getDB, setPageStack, getPageStak, getUserData, setUserDa
         if (user.STATUS == 200) {
           if (online.STATUS == 200) {
             console.log('data save! ✅');
+            await Sync_All_User_Data_On_Login(getDB, online.UID);
             setLoader(false);
             await CheckUser();
           } else {
@@ -148,6 +158,9 @@ const Verification = ({ getDB, setPageStack, getPageStak, getUserData, setUserDa
     }
   }
 
+  /**
+   * Send Mail.
+   */
   const sendMail = async () => {
     let emailRes;
     // if(getUserData[1][2]=='reset'){
@@ -277,6 +290,7 @@ const Verification = ({ getDB, setPageStack, getPageStak, getUserData, setUserDa
 
 export { Verification };
 
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
   container: {
     paddingTop: '10%',

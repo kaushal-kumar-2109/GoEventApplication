@@ -6,6 +6,9 @@ import { Load_Event_Data } from "../../../private/sync/read_online";
 
 const countries = ["Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Isle of Man", "Italy",];
 
+/**
+ * Choose Country.
+ */
 const ChooseCountry = ({ getDB, setPageStack, getUserData, setUserData }) => {
 
   const [search, setSearch] = useState("");
@@ -16,6 +19,9 @@ const ChooseCountry = ({ getDB, setPageStack, getUserData, setUserData }) => {
   );
 
   useEffect(() => {
+    /**
+     * Handles  load logic for the application.
+     */
     const handleLoad = async () => {
       try {
         await Load_Event_Data(getDB);
@@ -27,6 +33,9 @@ const ChooseCountry = ({ getDB, setPageStack, getUserData, setUserData }) => {
     handleLoad();
   }, []); // 👈 runs only once
 
+  /**
+   * Render Item.
+   */
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.countryItem}
@@ -77,6 +86,7 @@ const ChooseCountry = ({ getDB, setPageStack, getUserData, setUserData }) => {
 
 export { ChooseCountry };
 
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
   container: {
     width: '100%',

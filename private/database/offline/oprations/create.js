@@ -1,3 +1,4 @@
+// Local offline SQLite database helpers.
 import { initDB } from "../connect";
 import * as SQLite from "expo-sqlite";
 import * as Crypto from "expo-crypto";
@@ -36,6 +37,9 @@ const hashField = async (value) => {
   );
 };
 
+/**
+ * Hash Password.
+ */
 const hashPassword = async (password) => {
   const sha = await Crypto.digestStringAsync(
     Crypto.CryptoDigestAlgorithm.SHA256,
@@ -52,6 +56,9 @@ const sanitize = (val) => {
   return val;
 };
 
+/**
+ * Creates user in the application data store.
+ */
 const Create_User = async (DB, UID, data, task, hashPass) => {
   if (!DB || (DB.nativeDatabase && Object.keys(DB.nativeDatabase).length === 0)) {
     DB = await initDB();
@@ -131,6 +138,9 @@ const Create_User = async (DB, UID, data, task, hashPass) => {
   }
 }
 
+/**
+ * Creates event offline in the application data store.
+ */
 const Create_Event_Offline = async (DB, data) => {
   try {
     if (!DB || (DB.nativeDatabase && Object.keys(DB.nativeDatabase).length === 0)) {
@@ -159,12 +169,17 @@ const Create_Event_Offline = async (DB, data) => {
 
 
     console.log("Creating Event");
-    if (CheckInternet()) {
-      const on_res = await Create_Event_Online([eventId, userid, eventname, eventdate, eventamount, eventlocation, eventtime, eventabout, eventhighlight, eventtype, eventcreatedar, eventbanner, eventcode, eventstatus, updatedat]);
-      if (on_res.STATUS != 200) {
+    try {
+      if (CheckInternet()) {
+        const on_res = await Create_Event_Online([eventId, userid, eventname, eventdate, eventamount, eventlocation, eventtime, eventabout, eventhighlight, eventtype, eventcreatedar, eventbanner, eventcode, eventstatus, updatedat]);
+        if (on_res.STATUS != 200) {
+          await DB.runAsync("INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)", [Create_Id(), 'EVENT_DATA', eventId, 'create']);
+        }
+      } else {
         await DB.runAsync("INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)", [Create_Id(), 'EVENT_DATA', eventId, 'create']);
       }
-    } else {
+    } catch (onlineErr) {
+      console.log("Online creation failed, logging for sync:", onlineErr.message);
       await DB.runAsync("INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)", [Create_Id(), 'EVENT_DATA', eventId, 'create']);
     }
 
@@ -188,6 +203,10 @@ const Create_Event_Offline = async (DB, data) => {
         sanitize(updatedat)
       ]
     );
+
+    // Create notification for event creation
+    await Create_Notification(DB, userid, "Event Created! 🎉", `Your event "${eventname}" has been created successfully.`);
+
     await Write_App_Log(DB, userid, "INFO", "Event Created Offline", `Event: ${eventname}`);
     return ({ STATUS: 200, DATA: true });
   } catch (err) {
@@ -197,6 +216,62 @@ const Create_Event_Offline = async (DB, data) => {
   }
 }
 
+/**
+ * Creates notification in the application data store.
+ */
+const Create_Notification = async (DB, userid, title, message) => {
+  try {
+    if (!DB || (DB.nativeDatabase && Object.keys(DB.nativeDatabase).length === 0)) {
+      DB = await initDB();
+    }
+    const notificationId = Create_Id();
+    const time = new Date().toISOString();
+    await DB.runAsync(
+      "INSERT INTO NOTIFICATIONS (NOTIFICATION_ID, USER_ID, TITLE, MESSAGE, TIME, STATUS) VALUES (?, ?, ?, ?, ?, ?)",
+      [sanitize(notificationId), sanitize(userid), sanitize(title), sanitize(message), sanitize(time), 'UNREAD']
+    );
+
+    // Queue for sync
+    await DB.runAsync("INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)", [Create_Id(), 'NOTIFICATIONS', notificationId, 'create']);
+
+    return { STATUS: 200 };
+  } catch (err) {
+    console.log("Error creating notification:", err);
+    return { STATUS: 500, MES: err.message };
+  }
+}
+
+/**
+ * Creates booking in the application data store.
+ */
+const Create_Booking = async (DB, userid, eventid, eventname, attendeeData = {}) => {
+  try {
+    if (!DB || (DB.nativeDatabase && Object.keys(DB.nativeDatabase).length === 0)) {
+      DB = await initDB();
+    }
+    const bookingId = Create_Id();
+    const time = new Date().toISOString();
+    await DB.runAsync(
+      "INSERT INTO BOOKINGS (BOOKING_ID, USER_ID, EVENT_ID, ATTENDEE_NAME, ATTENDEE_EMAIL, ATTENDEE_NUMBER, ATTENDEE_GENDER, BOOKING_TIME, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [sanitize(bookingId), sanitize(userid), sanitize(eventid), sanitize(attendeeData.name), sanitize(attendeeData.email), sanitize(attendeeData.number), sanitize(attendeeData.gender), sanitize(time), 'PENDING']
+    );
+
+    // Queue for sync
+    await DB.runAsync("INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)", [Create_Id(), 'BOOKINGS', bookingId, 'create']);
+
+    // Notify user of booking
+    await Create_Notification(DB, userid, "Booking Confirmed! 🎟️", `You have successfully booked "${eventname}".`);
+
+    return { STATUS: 200 };
+  } catch (err) {
+    console.log("Error creating booking:", err);
+    return { STATUS: 500, MES: err.message };
+  }
+}
+
+/**
+ * Creates event invite offline in the application data store.
+ */
 const Create_Event_Invite_Offline = async (DB, data) => {
   if (!DB || (DB.nativeDatabase && Object.keys(DB.nativeDatabase).length === 0)) {
     DB = await initDB();
@@ -204,9 +279,7 @@ const Create_Event_Invite_Offline = async (DB, data) => {
   }
 
   try {
-
     for (let i = 0; i < data.length; i++) {
-
       let invitationId = Create_Id();
       let hostid = data[i].event.USER_ID;
       let member_Email = data[i].users.email;
@@ -219,45 +292,54 @@ const Create_Event_Invite_Offline = async (DB, data) => {
         [sanitize(invitationId), sanitize(hostid), sanitize(member_Email), sanitize(eventid), sanitize(status), sanitize(created_at)]
       );
 
-      if (CheckInternet()) {
-        let online = await Create_Event_Invite_Online([invitationId, hostid, member_Email, eventid, status, created_at]);
-        if (online.STATUS != 200) {
+      try {
+        if (CheckInternet()) {
+          let online = await Create_Event_Invite_Online([invitationId, hostid, member_Email, eventid, status, created_at]);
+          if (online.STATUS != 200) {
+            await DB.runAsync(
+              "INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)",
+              [Create_Id(), 'EVENT_INVITATION', invitationId, 'create']
+            );
+          }
+        } else {
           await DB.runAsync(
             "INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)",
             [Create_Id(), 'EVENT_INVITATION', invitationId, 'create']
           );
         }
-      }
-      else {
+      } catch (onlineErr) {
+        console.log("Online invitation failed, logging for sync:", onlineErr.message);
         await DB.runAsync(
           "INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)",
           [Create_Id(), 'EVENT_INVITATION', invitationId, 'create']
         );
       }
-
     }
     return ({ STATUS: 200 });
   } catch (err) {
     console.log("Erroe in the storing data : ", err);
     return ({ STATUS: 500, DATA: err });
   }
-
 }
 
-export { Create_User, Create_Event_Offline, Create_Event_Invite_Offline };
+export { Create_User, Create_Event_Offline, Create_Event_Invite_Offline, Create_Notification, Create_Booking };
 
+/**
+ * Generates a new unique identifier string for database records or logs.
+ */
 const Create_Id = () => {
   const serial = "1234567890qwertyuioplkjhgfdsazxcvbnmMNBVCXZASDFGHJKLPOIUYTREWQ";
   let id = "";
-
   for (let i = 0; i < 25; i++) {
     let index = Math.floor(Math.random() * serial.length);
     id += serial[index];
   }
-
   return id;
 };
 
+/**
+ * Generates a new event code string for offline event creation.
+ */
 function Create_Code() {
   return Math.floor(1000000000 + Math.random() * 9000000000);
 }

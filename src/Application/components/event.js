@@ -1,3 +1,4 @@
+// React component and screen logic for the app.
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useState, useRef } from 'react';
@@ -12,7 +13,13 @@ import { SideBar } from '../comman_component/sideBar';
 import { EventCard } from './sub_compo/EventCard';
 import { Read_From_evetndata } from '../../../private/database/offline/oprations/read';
 
+import { useTheme } from '../../../context/ThemeContext';
+
+/**
+ * Event Page.
+ */
 const EventPage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack }) => {
+    const { colors: theme, isDarkMode } = useTheme();
 
     const [getSideBar, setSideBar] = useState(false);
     const [getSearchValue, setSearchValue] = useState('');
@@ -97,7 +104,7 @@ const EventPage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack
 
     return (
         <>
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
 
                 <NavBar
                     setPageStack={setPageStack}
@@ -118,10 +125,10 @@ const EventPage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack
                     />
                 }
 
-                <ScrollView showsVerticalScrollIndicator={false}>
+                <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: theme.background }}>
 
                     {/* Horizontal Categories */}
-                    <View style={styles.categorySection}>
+                    <View style={[styles.categorySection, { backgroundColor: theme.card, borderBottomColor: theme.border }]}>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryScroll}>
                             {categories.map((cat, index) => (
                                 <TouchableOpacity
@@ -134,17 +141,19 @@ const EventPage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack
                                 >
                                     <View style={[
                                         styles.categoryIconCircle,
-                                        selectedCategory === cat.name && { backgroundColor: COLORS.primary }
+                                        { backgroundColor: theme.background },
+                                        selectedCategory === cat.name && { backgroundColor: theme.primary }
                                     ]}>
                                         <MaterialCommunityIcons
                                             name={cat.icon}
                                             size={22}
-                                            color={selectedCategory === cat.name ? '#ffffff' : COLORS.primary}
+                                            color={selectedCategory === cat.name ? '#ffffff' : theme.primary}
                                         />
                                     </View>
                                     <Text style={[
                                         styles.categoryText,
-                                        selectedCategory === cat.name && { color: COLORS.primary, fontWeight: 'bold' }
+                                        { color: theme.subtext },
+                                        selectedCategory === cat.name && { color: theme.primary, fontWeight: 'bold' }
                                     ]}>{cat.name}</Text>
                                 </TouchableOpacity>
                             ))}
@@ -154,15 +163,15 @@ const EventPage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack
                     {/* Filter Button Row */}
                     <View style={styles.filterRow}>
                         <TouchableOpacity 
-                            style={[styles.filterBtn, activeFilterCount > 0 && styles.filterBtnActive]}
+                            style={[styles.filterBtn, { backgroundColor: theme.card, borderColor: theme.border }, activeFilterCount > 0 && { backgroundColor: theme.primary, borderColor: theme.primary }]}
                             onPress={() => setShowFilterModal(true)}
                         >
                             <MaterialCommunityIcons
                                 name="tune-variant"
                                 size={20}
-                                color={activeFilterCount > 0 ? "#ffffff" : "#666"}
+                                color={activeFilterCount > 0 ? "#ffffff" : theme.subtext}
                             />
-                            <Text style={[styles.filterBtnText, activeFilterCount > 0 && { color: "#ffffff" }]}>
+                            <Text style={[styles.filterBtnText, { color: theme.subtext }, activeFilterCount > 0 && { color: "#ffffff" }]}>
                                 Price Filter {activeFilterCount > 0 ? `(${activeFilterCount})` : ''}
                             </Text>
                         </TouchableOpacity>
@@ -177,7 +186,7 @@ const EventPage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack
                                     setSearchValue('');
                                 }}
                             >
-                                <Text style={styles.clearBtnText}>Clear All</Text>
+                                <Text style={[styles.clearBtnText, { color: theme.primary }]}>Clear All</Text>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -200,8 +209,8 @@ const EventPage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack
                             )
                             : (
                                 <View style={styles.noDataContainer}>
-                                    <MaterialCommunityIcons name="calendar-search" size={60} color="#ccc" />
-                                    <Text style={styles.noDataText}>No events found matching your criteria</Text>
+                                    <MaterialCommunityIcons name="calendar-search" size={60} color={theme.border} />
+                                    <Text style={[styles.noDataText, { color: theme.subtext }]}>No events found matching your criteria</Text>
                                     <TouchableOpacity 
                                         style={styles.resetBtn}
                                         onPress={() => {
@@ -228,31 +237,31 @@ const EventPage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack
                     onRequestClose={() => setShowFilterModal(false)}
                 >
                     <View style={styles.modalOverlay}>
-                        <View style={styles.modalContent}>
+                        <View style={[styles.modalContent, { backgroundColor: theme.card }]}>
                             <View style={styles.modalHeader}>
-                                <Text style={styles.modalTitle}>Price Range</Text>
+                                <Text style={[styles.modalTitle, { color: theme.text }]}>Price Range</Text>
                                 <TouchableOpacity onPress={() => setShowFilterModal(false)}>
-                                    <Ionicons name="close" size={24} color="#000" />
+                                    <Ionicons name="close" size={24} color={theme.text} />
                                 </TouchableOpacity>
                             </View>
 
                             <View style={styles.modalBody}>
                                 <View style={styles.priceRow}>
                                     <View style={styles.inputGroup}>
-                                        <Text style={styles.inputLabel}>Min Price</Text>
+                                        <Text style={[styles.inputLabel, { color: theme.subtext }]}>Min Price</Text>
                                         <TextInput
-                                            style={styles.priceInput}
+                                            style={[styles.priceInput, { backgroundColor: theme.background, color: theme.text, borderColor: theme.border }]}
                                             placeholder="₹ 0"
                                             keyboardType="numeric"
                                             value={minPrice}
                                             onChangeText={setMinPrice}
                                         />
                                     </View>
-                                    <View style={styles.priceSeparator} />
+                                    <View style={[styles.priceSeparator, { backgroundColor: theme.border }]} />
                                     <View style={styles.inputGroup}>
-                                        <Text style={styles.inputLabel}>Max Price</Text>
+                                        <Text style={[styles.inputLabel, { color: theme.subtext }]}>Max Price</Text>
                                         <TextInput
-                                            style={styles.priceInput}
+                                            style={[styles.priceInput, { backgroundColor: theme.background, color: theme.text, borderColor: theme.border }]}
                                             placeholder="₹ Any"
                                             keyboardType="numeric"
                                             value={maxPrice}
@@ -267,7 +276,7 @@ const EventPage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack
                                     style={styles.applyBtn}
                                     onPress={() => setShowFilterModal(false)}
                                 >
-                                    <Text style={styles.applyBtnText}>Apply Filters</Text>
+                                    <Text style={[styles.applyBtnText, { color: '#ffffff' }]}>Apply Filters</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -282,16 +291,14 @@ const EventPage = ({ getDB, getUserData, setUserData, setPageStack, getPageStack
 export { EventPage };
 
 
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
     },
     categorySection: {
         paddingVertical: 15,
-        backgroundColor: '#fff',
         borderBottomWidth: 1,
-        borderBottomColor: '#eee',
     },
     categoryScroll: {
         paddingHorizontal: 15,
@@ -305,7 +312,6 @@ const styles = StyleSheet.create({
         width: 45,
         height: 45,
         borderRadius: 25,
-        backgroundColor: '#f0f0f0',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 5,
@@ -327,12 +333,10 @@ const styles = StyleSheet.create({
     filterBtn: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#fff',
         paddingHorizontal: 15,
         paddingVertical: 8,
         borderRadius: 20,
         borderWidth: 1,
-        borderColor: '#ddd',
         elevation: 2,
     },
     filterBtnActive: {
@@ -391,7 +395,6 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
     },
     modalContent: {
-        backgroundColor: '#fff',
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
         padding: 25,
@@ -427,11 +430,9 @@ const styles = StyleSheet.create({
     },
     priceInput: {
         borderWidth: 1,
-        borderColor: '#ddd',
         borderRadius: 12,
         padding: 12,
         fontSize: 16,
-        backgroundColor: '#f9f9f9',
     },
     priceSeparator: {
         width: 15,

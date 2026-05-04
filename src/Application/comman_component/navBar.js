@@ -1,13 +1,12 @@
-// importing pri-build components
-import { View, Text,StyleSheet, TouchableOpacity, TextInput } from 'react-native';
-import Entypo from '@expo/vector-icons/Entypo';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+// React component and screen logic for the app.
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { COLORS, getTheme, FONTS } from '../../../public/global';
 
-// importing custom components
-import { COLORS, FONTS } from '../../../public/global';
-import { useState } from 'react';
+import { useTheme } from '../../../context/ThemeContext';
 
 const NavBar = ({
     setPageStack,
@@ -16,161 +15,150 @@ const NavBar = ({
     getSearchValue,
     setSearchValue
 }) => {
+    const { colors: theme } = useTheme();
+    const [getSearchBar, setSearchBar] = useState(false);
 
-    const [getSearchBar,setSearchBar] = useState(false);
+    /**
+     * Handles  back logic for the application.
+     */
+    const handleBack = () => {
+        setPageStack(prev => prev.slice(0, -1));
+    };
 
-    return(
-        <View style={styles.container}>
+    const isInternalPage = ['Settings', 'Notifications', 'Invite Users', 'Check-in Scanner', 'Event Details'].includes(title);
 
-            {/* SEARCH BAR MODE */}
+    return (
+        <View style={[styles.container, { backgroundColor: theme.card, borderBottomColor: theme.border }]}>
             {getSearchBar ? (
-
                 <View style={styles.searchContainer}>
-
-                    {/* Back button */}
                     <TouchableOpacity
-                        onPress={()=>setSearchBar(false)}
+                        onPress={() => setSearchBar(false)}
                         style={styles.searchBackBtn}
                     >
-                        <Feather name="arrow-left" size={24} color="black" />
+                        <Feather name="arrow-left" size={24} color={theme.text} />
                     </TouchableOpacity>
-
-                    {/* Dynamic width input */}
                     <TextInput
-                        placeholder='Enter event name'
-                        style={styles.searchInput}
+                        placeholder='Search events...'
+                        placeholderTextColor={theme.subtext}
+                        style={[styles.searchInput, { color: theme.text, borderBottomColor: theme.primary }]}
                         value={getSearchValue}
                         onChangeText={setSearchValue}
                         autoFocus={true}
                     />
-
                 </View>
-
             ) : (
-
                 <>
-                {/* LEFT SIDE */}
-                <View style={styles.leftContainer}>
+                    <View style={styles.leftContainer}>
+                        {isInternalPage ? (
+                            <TouchableOpacity onPress={handleBack} style={styles.iconBtn}>
+                                <Ionicons name="arrow-back" size={24} color={theme.text} />
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity onPress={() => setSideBar(true)} style={styles.iconBtn}>
+                                <Ionicons name="menu-outline" size={28} color={theme.text} />
+                            </TouchableOpacity>
+                        )}
+                        <Text style={[styles.title, { color: theme.text }]}>
+                            {title}
+                        </Text>
+                    </View>
 
-                    {title === 'Saved' ? (
-
-                        <TouchableOpacity
-                            onPress={()=>setPageStack('home')}
-                        >
-                            <Feather name="arrow-left" size={24} color="black" />
-                        </TouchableOpacity>
-
-                    ) : (
-
-                        <TouchableOpacity
-                            onPress={()=>setSideBar(true)}
-                        >
-                            <Entypo name="menu" size={24} color="black" />
-                        </TouchableOpacity>
-
-                    )}
-
-                    <Text style={[FONTS.title,{marginLeft:8}]}>
-                        {title}
-                    </Text>
-
-                </View>
-
-
-                {/* RIGHT SIDE */}
-                <View style={styles.rightContainer}>
-
-                    {(title==="Events" || title==="Vendors") &&
+                    <View style={styles.rightContainer}>
+                        {(title === "Events") && (
+                            <TouchableOpacity
+                                style={styles.iconBtn}
+                                onPress={() => setSearchBar(true)}
+                            >
+                                <Ionicons name="search-outline" size={24} color={theme.text} />
+                            </TouchableOpacity>
+                        )}
 
                         <TouchableOpacity
-                            style={{marginRight:18}}
-                            onPress={()=>setSearchBar(true)}
+                            style={styles.iconBtn}
+                            onPress={() => setPageStack(prev => [...prev, 'notification'])}
                         >
-                            <MaterialCommunityIcons
-                                name="magnify"
-                                size={24}
-                                color="black"
-                            />
+                            <Ionicons name="notifications-outline" size={24} color={theme.text} />
+                            {/* Potential Notification Badge */}
+                            <View style={styles.badge} />
                         </TouchableOpacity>
 
-                    }
-
-
-                    {title !=='Saved' &&
-
-                        <TouchableOpacity
-                            onPress={()=>setPageStack('saved')}
-                        >
-                            <FontAwesome
-                                name="bookmark-o"
-                                size={22}
-                                color="black"
-                            />
-                        </TouchableOpacity>
-
-                    }
-
-                </View>
-
+                        {!isInternalPage && (
+                            <TouchableOpacity
+                                style={styles.iconBtn}
+                                onPress={() => setPageStack(prev => [...prev, 'setting'])}
+                            >
+                                <Ionicons name="settings-outline" size={24} color={theme.text} />
+                            </TouchableOpacity>
+                        )}
+                    </View>
                 </>
             )}
-
         </View>
-    )
-}
+    );
+};
 
-export {NavBar};
+export { NavBar };
 
-
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
-
-    container:{
-        paddingVertical:18,
-        paddingHorizontal:15,
-        width:'100%',
-        flexDirection:'row',
-        justifyContent:'space-between',
-        alignItems:'center',
-        borderBottomWidth:3,
-        borderColor:'#cac4c42d',
-        backgroundColor:'#fff'
+    container: {
+        paddingTop: Platform.OS === 'ios' ? 10 : 20,
+        paddingBottom: 15,
+        paddingHorizontal: 15,
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        elevation: 2,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
     },
-
-
-    leftContainer:{
-        flexDirection:'row',
-        alignItems:'center'
+    leftContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
-
-
-    rightContainer:{
-        flexDirection:'row',
-        alignItems:'center'
+    rightContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
     },
-
-
-    // SEARCH MODE CONTAINER
-    searchContainer:{
-        flexDirection:'row',
-        alignItems:'center',
-        width:'100%',
+    title: {
+        fontSize: 20,
+        fontWeight: '800',
+        marginLeft: 10,
     },
-
-
-    searchBackBtn:{
-        marginRight:10
+    iconBtn: {
+        padding: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-
-
-    // ✅ Dynamic width input (takes remaining 80–90% space)
-    searchInput:{
-        flex:1,                  // important for dynamic width
-        fontSize:16,
-        borderBottomWidth:1,
-        borderColor:'#ccc',
-        paddingVertical:6,
-        paddingHorizontal:5,
-        width:'80%'              // fallback safety
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '100%',
+    },
+    searchBackBtn: {
+        marginRight: 10,
+    },
+    searchInput: {
+        flex: 1,
+        fontSize: 16,
+        borderBottomWidth: 2,
+        paddingVertical: 6,
+        paddingHorizontal: 5,
+    },
+    badge: {
+        position: 'absolute',
+        top: 8,
+        right: 8,
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: '#EF4444',
+        borderWidth: 2,
+        borderColor: '#fff',
     }
-
 });

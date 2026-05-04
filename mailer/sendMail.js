@@ -1,5 +1,9 @@
+// Mailer API calls and route definitions.
 import { APIs } from "./routers";
 
+/**
+ * Sends  email through an API call.
+ */
 const SendEmail = async (data) => {
 
   let response

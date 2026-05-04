@@ -2,40 +2,46 @@
 import { StyleSheet } from "react-native";
 
 const COLORS = {
-  primary:"#3B82F6",   // Blue
+  primary: "#3B82F6",   // Blue
   secondary: "#10B981", // Green
   error: "#EF4444",     // Red
   text: "#111827",      // Dark gray
   subtext: "#6B7280",   // Gray
-  background: "#fef4deff", // Light gray
-  primaryBtn : "#003366",  // dark blue
-  secondaryBtn : "#90bfefff"  // lighter blue
+  background: "#F8FAFC", // Light background
+  card: "#FFFFFF",
+  border: "#E2E8F0",
+  primaryBtn: "#003366",  // dark blue
+  secondaryBtn: "#90bfefff"  // lighter blue
+};
+
+const DARK_COLORS = {
+  primary: "#60A5FA",   // Lighter blue for dark mode
+  secondary: "#34D399",
+  error: "#F87171",
+  text: "#F9FAFB",      // Light text
+  subtext: "#9CA3AF",   // Light gray
+  background: "#0F172A", // Dark navy background
+  card: "#1E293B",      // Darker navy card
+  border: "#334155",
+  primaryBtn: "#3B82F6",
+  secondaryBtn: "#1E3A8A"
 };
 
 const LinearColor = {
-  Pri_Sec_Pri : ["#3B82F6","#90bfefff","#3B82F6"],
-  Sec_Pri_Sec : ["#90bfefff","#3B82F6","#90bfefff"],
-  PriBtn_Sec_PriBtn : ["#90bfefff","#003366","#90bfefff"],
-  Sec_PriBtn_Sec : ["#003366","#90bfefff","#003366"]
-}
-
-const TextCOLORS = {
-  primary:{color:"#3B82F6"},   // Blue
-  secondary:{color:"#10B981"}, // Green
-  error:{color:"#EF4444"},     // Red
-  text: {color:"#111827"},      // Dark gray
-  subtext: {color:"#6B7280"},   // Gray
-  background: {color:"#F9FAFB"} // Light gray
+  Pri_Sec_Pri: ["#3B82F6", "#90bfefff", "#3B82F6"],
+  Sec_Pri_Sec: ["#90bfefff", "#3B82F6", "#90bfefff"],
+  PriBtn_Sec_PriBtn: ["#90bfefff", "#003366", "#90bfefff"],
+  Sec_PriBtn_Sec: ["#003366", "#90bfefff", "#003366"]
 };
 
 const FONTS = {
-  logo: { fontSize: 34, fontWeight: "bold", color: COLORS.primary },
-  title: { fontSize: 20, fontWeight: "600", color: COLORS.text },
-  heading: { fontSize: 20, fontWeight: "600", color: COLORS.text },
-  label: { fontSize: 16, fontWeight: "500", color: COLORS.text },
-  body: { fontSize: 14, fontWeight: "400", color: COLORS.text },
-  small: { fontSize: 12, fontWeight: "400", color: COLORS.subtext },
-  error: { fontSize: 12, fontWeight: "400", color: COLORS.error }
+  logo: { fontSize: 34, fontWeight: "bold" },
+  title: { fontSize: 22, fontWeight: "800" },
+  heading: { fontSize: 20, fontWeight: "700" },
+  label: { fontSize: 16, fontWeight: "600" },
+  body: { fontSize: 14, fontWeight: "500" },
+  small: { fontSize: 12, fontWeight: "500" },
+  error: { fontSize: 12, fontWeight: "500", color: COLORS.error }
 };
 
 const ICONS = {
@@ -54,33 +60,7 @@ const SPACING = {
   xl: 24
 };
 
-// Example usage with StyleSheet
-const globalStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    padding: SPACING.md
-  },
-  titleText: {
-    ...FONTS.title,
-    marginBottom: SPACING.sm
-  },
-  bodyText: {
-    ...FONTS.body,
-    marginBottom: SPACING.sm
-  },
-  button: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: SPACING.sm,
-    paddingHorizontal: SPACING.md,
-    borderRadius: 8,
-    alignItems: "center"
-  },
-  buttonText: {
-    ...FONTS.label,
-    color: "#fff"
-  }
-});
+// Helper to get active theme colors
+const getTheme = (isDark) => (isDark ? DARK_COLORS : COLORS);
 
-
-export {globalStyles,SPACING,ICONS,FONTS,COLORS,TextCOLORS,LinearColor}
+export { SPACING, ICONS, FONTS, COLORS, DARK_COLORS, LinearColor, getTheme };

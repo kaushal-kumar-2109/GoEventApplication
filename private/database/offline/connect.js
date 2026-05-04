@@ -9,7 +9,7 @@ async function initDB() {
 
     try {
         const db = await SQLite.openDatabaseAsync("GoEvent.db");
-        
+
         // Set journal mode once
         await db.execAsync("PRAGMA journal_mode = WAL;");
 
@@ -105,6 +105,46 @@ async function initDB() {
             );
         `);
 
+        // NOTIFICATIONS Table
+        await db.execAsync(`
+            CREATE TABLE IF NOT EXISTS NOTIFICATIONS (
+                NOTIFICATION_ID VARCHAR(100) PRIMARY KEY,
+                USER_ID VARCHAR(100) NOT NULL,
+                TITLE TEXT NOT NULL,
+                MESSAGE TEXT NOT NULL,
+                TIME TEXT NOT NULL,
+                STATUS VARCHAR(20) DEFAULT 'UNREAD'
+            );
+        `);
+
+        // BOOKINGS Table
+        await db.execAsync(`
+            CREATE TABLE IF NOT EXISTS BOOKINGS (
+                BOOKING_ID VARCHAR(100) PRIMARY KEY,
+                USER_ID VARCHAR(100) NOT NULL,
+                EVENT_ID VARCHAR(100) NOT NULL,
+                ATTENDEE_NAME TEXT,
+                ATTENDEE_EMAIL TEXT,
+                ATTENDEE_NUMBER TEXT,
+                ATTENDEE_GENDER TEXT,
+                BOOKING_TIME TEXT NOT NULL,
+                STATUS VARCHAR(20) DEFAULT 'PENDING'
+            );
+        `);
+
+        // SETTINGS Table
+        await db.execAsync(`
+            CREATE TABLE IF NOT EXISTS SETTINGS (
+                SETTING_ID VARCHAR(50) PRIMARY KEY,
+                VALUE TEXT NOT NULL
+            );
+        `);
+
+        // Insert default theme if not exists
+        await db.execAsync(`
+            INSERT OR IGNORE INTO SETTINGS (SETTING_ID, VALUE) VALUES ('THEME', 'light');
+        `);
+
         // Migration: Ensure USER_ID column exists if the table was created previously without it
         try {
             const tableInfo = await db.getAllAsync("PRAGMA table_info(APP_LOGS)");
@@ -115,6 +155,23 @@ async function initDB() {
             }
         } catch (e) {
             console.log("Migration Error (APP_LOGS):", e);
+        }
+
+        // Migration: Ensure new fields exist in BOOKINGS
+        try {
+            const tableInfo = await db.getAllAsync("PRAGMA table_info(BOOKINGS)");
+            const hasAttendeeName = tableInfo.some(col => col.name === 'ATTENDEE_NAME');
+            if (tableInfo.length > 0 && !hasAttendeeName) {
+                await db.execAsync(`
+                    ALTER TABLE BOOKINGS ADD COLUMN ATTENDEE_NAME TEXT;
+                    ALTER TABLE BOOKINGS ADD COLUMN ATTENDEE_EMAIL TEXT;
+                    ALTER TABLE BOOKINGS ADD COLUMN ATTENDEE_NUMBER TEXT;
+                    ALTER TABLE BOOKINGS ADD COLUMN ATTENDEE_GENDER TEXT;
+                `);
+                console.log("Migration: Added ATTENDEE fields to BOOKINGS");
+            }
+        } catch (e) {
+            console.log("Migration Error (BOOKINGS):", e);
         }
 
         console.log("Database initialized ✅");

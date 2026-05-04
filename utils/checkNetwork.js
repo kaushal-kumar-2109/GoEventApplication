@@ -1,3 +1,4 @@
+// Source module for application logic.
 import * as Network from "expo-network";
 
 async function CheckInternet() {
@@ -8,7 +9,6 @@ async function CheckInternet() {
   if (state.isConnected) {
     return state.isConnected;
   } else {
-    alert("❌ No internet connection");
     return false;
   }
 }

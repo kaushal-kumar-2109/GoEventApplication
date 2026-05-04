@@ -1,3 +1,4 @@
+// React component and screen logic for the app.
 import { View,Image, StyleSheet,Text, TouchableOpacity } from "react-native";
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import Feather from '@expo/vector-icons/Feather';
@@ -8,6 +9,9 @@ import { COLORS } from "../../../public/styles/global";
 import { use } from "react";
 import { AddToOffline } from "../../../OfflineDataHandle/bookMark";
 
+/**
+ * Event Card.
+ */
 const EventCard = ({DATA,color}) => {
 
     return(
@@ -51,6 +55,7 @@ const EventCard = ({DATA,color}) => {
 
 export {EventCard};
 
+// Style definitions for the style component.
 const Style= StyleSheet.create({
     Card:{
         width:280,

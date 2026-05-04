@@ -1,5 +1,9 @@
+// Online database communication helpers.
 import { SUP_BASE } from "../connect";
 
+/**
+ * Deletes event online from the database or local store.
+ */
 const Delete_Event_Online = async (UID, EID) => {
     const { data, error } = await SUP_BASE
         .from("EVENT_DATA")

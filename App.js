@@ -11,7 +11,8 @@ import { Account_Create_Collector } from './src/AccountCreate/collector';
 import { initDB } from './private/database/offline/connect';
 import { Read_From_userdata } from './private/database/offline/oprations/read';
 import Application from './src/Application/collector';
-import { Load_Event_Invitation } from './private/sync/read_online';
+import { Load_Event_Invitation, Start_Sync_Interval } from './private/sync/read_online';
+import { ThemeProvider } from './context/ThemeContext';
 
 // import { Delete_Unwanted_Event } from './private/sync/wright_offline';
 
@@ -20,6 +21,9 @@ export default function App() {
   const [getUserData, setUserData] = useState(false);
   const [getDB, setDB] = useState(false);
 
+  /**
+   * Checks  user and returns the relevant status or result.
+   */
   const CheckUser = async () => {
     const DB = await initDB();
     setDB(DB);
@@ -27,11 +31,15 @@ export default function App() {
     if (Data.STATUS == 200 && Data.DATA.length > 0) {
       setUserData(Data.DATA);
       Load_Event_Invitation(DB, Data.DATA[0].USER_ID);
+      Start_Sync_Interval(DB, Data.DATA[0].USER_ID);
       // Delete_Unwanted_Event(DB);
     }
   }
 
   useEffect(() => {
+    /**
+     * Setup UI.
+     */
     const setupUI = async () => {
       await NavigationBar.setVisibilityAsync("hidden");
       await NavigationBar.setBehaviorAsync("overlay-swipe");
@@ -46,11 +54,14 @@ export default function App() {
       <Account_Create_Collector getDB={getDB} CheckUser={CheckUser}></Account_Create_Collector>
     }
     {getUserData &&
-      <Application getDB={getDB} getUserData={getUserData} setUserData={setUserData}></Application>
+      <ThemeProvider>
+        <Application getDB={getDB} getUserData={getUserData} setUserData={setUserData}></Application>
+      </ThemeProvider>
     }
   </>);
 }
 
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
   container: {
     flex: 1,

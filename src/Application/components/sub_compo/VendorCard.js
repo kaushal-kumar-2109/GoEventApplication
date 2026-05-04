@@ -1,12 +1,18 @@
+// React component and screen logic for the app.
 import { View,Image, StyleSheet,Text, TouchableOpacity } from "react-native";
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { useTheme } from "../../../../context/ThemeContext";
 
+/**
+ * Vendor Card.
+ */
 const VendorCard = ({DATA,getPageStack,setPageStack,color}) => {
+    const { colors: theme } = useTheme();
 
     return(
-        <TouchableOpacity style={[Style.Card]}
+        <TouchableOpacity style={[Style.Card, { backgroundColor: theme.card, borderColor: theme.border }]}
         onPress={()=>setPageStack([...getPageStack,`vendorDetails.${DATA.ID}`])}
         >
             
@@ -16,23 +22,23 @@ const VendorCard = ({DATA,getPageStack,setPageStack,color}) => {
             </View>
 
             <View style={[{top:-50}]}>
-                <Text style={[{fontWeight:800,fontSize:20,color:'#686666ff'}]} numberOfLines={1} ellipsizeMode="tail">{DATA.VENDORNAME}</Text>
+                <Text style={[{fontWeight:'800',fontSize:20,color:theme.text}]} numberOfLines={1} ellipsizeMode="tail">{DATA.VENDORNAME}</Text>
                 <View style={[Style.DetailDiv]}>
-                    <Entypo name="location-pin" size={24} color="#686666ff" />
-                    <Text style={[Style.Detail]} numberOfLines={1} ellipsizeMode="tail">{DATA.VENDORCITY} / {DATA.VENDORCOUNTRY}</Text>
+                    <Entypo name="location-pin" size={24} color={theme.subtext} />
+                    <Text style={[Style.Detail, { color: theme.subtext }]} numberOfLines={1} ellipsizeMode="tail">{DATA.VENDORCITY} / {DATA.VENDORCOUNTRY}</Text>
                 </View>
                 <View style={[Style.DetailDiv]}>
-                    <FontAwesome5 name="rupee-sign" size={18} color="#686666ff" style={[{marginLeft:8}]}/>
-                    <Text style={[Style.Detail,{marginLeft:10}]} numberOfLines={1} ellipsizeMode="tail">
+                    <FontAwesome5 name="rupee-sign" size={18} color={theme.subtext} style={[{marginLeft:8}]}/>
+                    <Text style={[Style.Detail, { color: theme.subtext, marginLeft: 10 }]} numberOfLines={1} ellipsizeMode="tail">
                         {DATA.VENDORPRICE}
                     </Text>
                 </View>
                 <View style={[Style.DetailDiv]}>
                     <AntDesign name="star" size={24} color="#f1e917a5"/>
-                    <Text style={[Style.Detail]} numberOfLines={1} ellipsizeMode="tail">{DATA.VENDORRATING}</Text>
+                    <Text style={[Style.Detail, { color: theme.subtext }]} numberOfLines={1} ellipsizeMode="tail">{DATA.VENDORRATING}</Text>
                 </View>
                 <View style={[Style.DetailDiv,{marginLeft:5}]}>
-                    <Text style={[Style.Detail]} numberOfLines={2} ellipsizeMode="tail">{DATA.VENDORBIO}</Text>
+                    <Text style={[Style.Detail, { color: theme.subtext }]} numberOfLines={2} ellipsizeMode="tail">{DATA.VENDORBIO}</Text>
                 </View>
 
                 <View style={[{flexDirection:'row',justifyContent:'space-between',marginTop:20,alignItems:'center'}]}>
@@ -56,6 +62,7 @@ const VendorCard = ({DATA,getPageStack,setPageStack,color}) => {
 
 export {VendorCard};
 
+// Style definitions for the style component.
 const Style= StyleSheet.create({
     Card:{
         width:280,

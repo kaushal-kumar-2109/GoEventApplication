@@ -1,3 +1,4 @@
+// Source module for application logic.
 import CryptoJS from "crypto-js";
 import * as Crypto from "expo-crypto";
 

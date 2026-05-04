@@ -1,4 +1,8 @@
+// React component and screen logic for the app.
 import { View,StyleSheet, ScrollView } from "react-native";
+/**
+ * Event Filter.
+ */
 const EventFilter = () => {
     return(
         <View style={[styles.container]}>
@@ -11,6 +15,7 @@ const EventFilter = () => {
 
 export {EventFilter};
 
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
     container:{
         position:'absolute',

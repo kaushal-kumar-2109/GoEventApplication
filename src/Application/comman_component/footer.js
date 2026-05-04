@@ -8,28 +8,38 @@ import Fontisto from '@expo/vector-icons/Fontisto';
 // importing custom components
 import { FONTS,COLORS } from '../../../public/global';
 import { useEffect, useState } from "react";
+import { useTheme } from "../../../context/ThemeContext";
 
+/**
+ * Foot Bar.
+ */
 const FootBar = ({setPageStack,getPageStack}) => {
-
+    const { isDarkMode, colors: theme } = useTheme();
     const [getHomeColor,setHomeColor] = useState('#6B7280');
     const [getEventColor,setEventColor] = useState('#6B7280');
     const [getVendorColor,setVendorColor] = useState('#6B7280');
     const [getProfileColor,setProfileColor] = useState('#6B7280');
     
+    /**
+     * Set Color.
+     */
     const setColor = () => {
-        (getPageStack[getPageStack.length-1]==='home')?setHomeColor(COLORS.primary):setHomeColor("#6B7280");
-        (getPageStack[getPageStack.length-1]==='event')?setEventColor(COLORS.primary):setEventColor("#6B7280");
-        (getPageStack[getPageStack.length-1]==='vendor')?setVendorColor(COLORS.primary):setVendorColor("#6B7280");
-        (getPageStack[getPageStack.length-1]==='user')?setProfileColor(COLORS.primary):setProfileColor("#6B7280");
+        const activeColor = theme.primary;
+        const inactiveColor = isDarkMode ? '#94A3B8' : '#6B7280';
+        
+        (getPageStack[getPageStack.length-1]==='home')?setHomeColor(activeColor):setHomeColor(inactiveColor);
+        (getPageStack[getPageStack.length-1]==='event')?setEventColor(activeColor):setEventColor(inactiveColor);
+        (getPageStack[getPageStack.length-1]==='vendor')?setVendorColor(activeColor):setVendorColor(inactiveColor);
+        (getPageStack[getPageStack.length-1]==='user')?setProfileColor(activeColor):setProfileColor(inactiveColor);
     }
 
     useEffect(()=>{
         setColor();
-    },[])
+    },[getPageStack, isDarkMode])
 
     return(
         <>
-        <View style={[styles.container]}>
+        <View style={[styles.container, { backgroundColor: theme.card, borderTopColor: theme.border }]}>
             <View style={[{display:'flex', flexDirection:'row', alignItems:'center',justifyContent:'space-evenly',width:'100%'}]}>
 
 {getPageStack[getPageStack.length - 1]=='home' ? 
@@ -96,6 +106,7 @@ const FootBar = ({setPageStack,getPageStack}) => {
 
 export {FootBar};
 
+// Style definitions for the styles component.
 const styles = StyleSheet.create({
     container:{
         paddingVertical:10,

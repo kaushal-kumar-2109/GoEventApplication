@@ -1,7 +1,11 @@
+// Local offline SQLite database helpers.
 import { initDB } from "../connect";
 import { CheckInternet } from "../../../../utils/checkNetwork";
 import { Create_App_Log_Online } from "../../online/oprations/create";
 
+/**
+ * Generates a new unique identifier string for database records or logs.
+ */
 const Create_Id = () => {
     const serial = "1234567890qwertyuioplkjhgfdsazxcvbnmMNBVCXZASDFGHJKLPOIUYTREWQ";
     let id = "";
@@ -45,24 +49,32 @@ const Write_App_Log = async (DB, USER_ID, type, message, detail = "") => {
         console.log(`[APP_LOG] ${type}: ${message}`);
 
         // Handle Online Sync
-        if (CheckInternet()) {
-            const onlineRes = await Create_App_Log_Online({
-                LOG_ID: logId,
-                USER_ID: USER_ID,
-                LOG_TIME: logTime,
-                LOG_TYPE: type,
-                LOG_MESSAGE: message,
-                LOG_DETAIL: detail
-            });
-            if (onlineRes.STATUS !== 200) {
-                // If online insertion fails, queue it
+        try {
+            if (CheckInternet()) {
+                const onlineRes = await Create_App_Log_Online({
+                    LOG_ID: logId,
+                    USER_ID: USER_ID,
+                    LOG_TIME: logTime,
+                    LOG_TYPE: type,
+                    LOG_MESSAGE: message,
+                    LOG_DETAIL: detail
+                });
+                if (onlineRes.STATUS !== 200) {
+                    // If online insertion fails, queue it
+                    await DB.runAsync(
+                        "INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)",
+                        [Create_Id(), 'APP_LOGS', logId, 'create']
+                    );
+                }
+            } else {
+                // If offline, queue it for later sync
                 await DB.runAsync(
                     "INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)",
                     [Create_Id(), 'APP_LOGS', logId, 'create']
                 );
             }
-        } else {
-            // If offline, queue it for later sync
+        } catch (onlineErr) {
+            console.log("Online log creation failed, logging for sync:", onlineErr.message);
             await DB.runAsync(
                 "INSERT INTO LOG_DATA (LOG_ID, TABLE_NAME, DATA_ID, TASK) VALUES (?, ?, ?, ?)",
                 [Create_Id(), 'APP_LOGS', logId, 'create']
