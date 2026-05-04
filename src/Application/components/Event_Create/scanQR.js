@@ -42,12 +42,9 @@ const QR_Scanner = ({ getDB, getPageStack, setPageStack }) => {
   const animValue = useState(new Animated.Value(0))[0];
 
   /**
- * Sync_All_User_Data_On_Login:
- * This orchestrator function is called immediately after a user logs in 
- * or signs up. It pulls all historical data (Events, Invitations, Bookings, 
- * Notifications) from the cloud to ensure the offline-first app is ready.
- */
-const Sync_All_User_Data_On_Login = async (DB, USER_ID) => {
+   * Trigger Status Animation.
+   */
+  const triggerStatusAnimation = (type) => {
     setStatusType(type);
     setShowStatus(true);
     Animated.spring(animValue, {
@@ -66,11 +63,9 @@ const Sync_All_User_Data_On_Login = async (DB, USER_ID) => {
   };
 
   /**
- * Load_Event_Invitation:
- * Fetches all invitations sent by this host from Supabase and writes them 
- * to the local SQLite database.
- */
-const Load_Event_Invitation = async (DB, USER_ID) => {
+   * Handles  search logic for the application.
+   */
+  const handleSearch = (text) => {
     setSearchText(text);
     if (text.trim() === "") {
       setTempList(allList);
@@ -90,12 +85,9 @@ const Load_Event_Invitation = async (DB, USER_ID) => {
    *    if internet is available. This ensures real-time security across multiple devices.
    * 2. If offline, it uses the local SQLite data.
    * 3. If the ticket is 'PENDING', it marks it as 'ACCEPTED' both locally and logs it 
-   *    for background synchronization/**
- * Write_Offline_Bookings:
- * Writes booking data to SQLite. Uses 'INSERT OR REPLACE' to handle 
- * status updates and prevent duplicate key errors.
- */
-const Write_Offline_Bookings = async (db, data) => {
+   *    for background synchronization to the online database.
+   */
+  const isScannedCheck = async (data) => {
     setIsProcessing(true);
     let found = false;
     for (let i = 0; i < allList.length; i++) {

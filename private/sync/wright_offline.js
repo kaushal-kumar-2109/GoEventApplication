@@ -44,7 +44,9 @@ const Write_Offline_Event = async (DB, data) => {
 }
 
 /**
- * Write Offline Event Invitation.
+ * Write_Offline_Event_Invitation:
+ * Writes invitation data to SQLite. Uses 'INSERT OR REPLACE' so that 
+ * existing records are updated with the latest status from the server.
  */
 const Write_Offline_Event_Invitation = async (db, data) => {
     if (!db) {
@@ -75,7 +77,9 @@ const Write_Offline_Event_Invitation = async (db, data) => {
 }
 
 /**
- * Write Offline Bookings.
+ * Write_Offline_Bookings:
+ * Writes booking data to SQLite. Uses 'INSERT OR REPLACE' to handle 
+ * status updates and prevent duplicate key errors.
  */
 const Write_Offline_Bookings = async (db, data) => {
     if (!db) {

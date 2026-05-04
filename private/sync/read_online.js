@@ -34,7 +34,9 @@ const Load_Event_Data = async (DB) => {
 }
 
 /**
- * Loads  event invitation and prepares it for use by the application.
+ * Load_Event_Invitation:
+ * Fetches all invitations sent by this host from Supabase and writes them 
+ * to the local SQLite database.
  */
 const Load_Event_Invitation = async (DB, USER_ID) => {
     const { data, error } = await SUP_BASE
@@ -60,7 +62,10 @@ const Load_Event_Invitation = async (DB, USER_ID) => {
 }
 
 /**
- * Loads bookings and prepares it for use by the application.
+ * Load_Bookings:
+ * Fetches bookings from Supabase. It retrieves bookings where the user is 
+ * either the attendee OR the host of the event. This is crucial for both 
+ * the 'My Bookings' section and the 'Check-in Scanner'.
  */
 const Load_Bookings = async (DB, USER_ID) => {
     // 1. Fetch events hosted by this user to get bookings for those events (for scanning)
@@ -110,7 +115,10 @@ const Load_Notifications = async (DB, USER_ID) => {
 }
 
 /**
- * Sync All User Data on Login.
+ * Sync_All_User_Data_On_Login:
+ * This orchestrator function is called immediately after a user logs in 
+ * or signs up. It pulls all historical data (Events, Invitations, Bookings, 
+ * Notifications) from the cloud to ensure the offline-first app is ready.
  */
 const Sync_All_User_Data_On_Login = async (DB, USER_ID) => {
     try {

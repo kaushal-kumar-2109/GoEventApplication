@@ -1,5 +1,5 @@
 // Mailer API calls and route definitions.
-const HOST_NETWORK_PATH = 'http://10.210.126.18:3000';
+const HOST_NETWORK_PATH = 'https://goeventserver.onrender.com';
 // http://10.210.126.18:3000/GoEvent/User
 // https://goeventserver.onrender.com
 
